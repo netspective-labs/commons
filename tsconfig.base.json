@@ -1,0 +1,35 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "rootDir": ".",
+    "sourceMap": true,
+    "declaration": false,
+    "moduleResolution": "node",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "target": "ESNext",
+    "module": "ESNext",
+    "lib": ["ESNext", "dom"],
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "noPropertyAccessFromIndexSignature": false,
+    "baseUrl": ".",
+    "paths": {
+      "@mcasaresmdevz/nlc-nodejs-astro": ["packages/nodejs/astro/src/index.js"],
+      "@mcasaresmdevz/nlc-nodejs-remark": [
+        "packages/nodejs/remark/src/index.ts"
+      ],
+      "@mcasaresmdevz/nlc-nodejs-universal": [
+        "packages/nodejs/universal/src/index.ts"
+      ],
+      "@mcasaresmdevz/nlc-nodejs-webc": [
+        "packages/nodejs-user-agent/webc/src/index.ts"
+      ],
+      "mcasaresmdevz/nlc-nodejs-remarkk": [
+        "packages/nodejs/remarkk/src/index.ts"
+      ]
+    }
+  },
+  "exclude": ["node_modules", "tmp"]
+}

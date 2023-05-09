@@ -1,0 +1,16 @@
+---
+export interface Props {
+  // TODO:
+  // readonly collection: typed collection name
+  // reaoonly slug: name of page
+  readonly assignee: string;
+}
+
+const { assignee } = Astro.props;
+// TODO: add ActionItem into frontmatter so that it can be queried and collected
+// - if this components ends up using custom CSS or is not unviersal, move it to `ds`
+// - store the state into SQLite :memory: DB
+// - wrap in <span data-action-item={}></span> or add data to <mark> for identity at runtime
+---
+
+<mark>[<b>{assignee}</b>] <slot /></mark>

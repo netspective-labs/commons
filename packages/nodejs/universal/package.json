@@ -1,0 +1,13 @@
+{
+  "name": "@mcasaresmdevz/nlc-nodejs-universal",
+  "version": "0.0.3",
+  "type": "commonjs",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mcasaresmdevz/nx-commons-05/nlc-universal.git",
+    "directory": "packages/nodejs/universal"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  }
+}

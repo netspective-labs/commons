@@ -1,0 +1,49 @@
+{
+  "name": "nodejs-universal",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/nodejs/universal/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "@nrwl/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/packages/nodejs/universal",
+        "main": "packages/nodejs/universal/src/index.ts",
+        "tsConfig": "packages/nodejs/universal/tsconfig.lib.json",
+        "assets": ["packages/nodejs/universal/*.md"]
+      }
+    },
+    "publish": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node tools/scripts/publish.mjs nodejs-universal {args.ver} {args.tag}",
+        "args": "--ver='0.0.3' --tag='latest'"
+      },
+      "dependsOn": ["build"]
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["packages/nodejs/universal/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nx/vite:test",
+      "outputs": ["coverage/packages/nodejs/universal"],
+      "options": {
+        "passWithNoTests": false,
+        "coverage": true,
+        "reportsDirectory": "../../../coverage/packages/nodejs/universal"
+      },
+      "configurations": {
+        "ci": {
+          "ci": true,
+          "codeCoverage": true
+        }
+      }
+    }
+  },
+  "tags": []
+}

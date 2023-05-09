@@ -1,0 +1,13 @@
+{
+  "name": "@mcasaresmdevz/nlc-nodejs-remark",
+  "version": "0.0.1",
+  "type": "commonjs",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mcasaresmdevz/nx-commons-05/nlc-remark.git",
+    "directory": "packages/nodejs/remark"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  }
+}

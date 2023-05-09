@@ -1,0 +1,49 @@
+{
+  "name": "nodejs-user-agent-webc",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/nodejs-user-agent/webc/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/packages/nodejs-user-agent/webc",
+        "main": "packages/nodejs-user-agent/webc/src/index.ts",
+        "tsConfig": "packages/nodejs-user-agent/webc/tsconfig.lib.json",
+        "assets": ["packages/nodejs-user-agent/webc/*.md"]
+      }
+    },
+    "publish": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node tools/scripts/publish.mjs nodejs-user-agent-webc {args.ver} {args.tag}",
+        "args": "--ver='0.0.1' --tag='latest'"
+      },
+      "dependsOn": ["build"]
+    },
+    "lint": {
+      "executor": "@nx/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["packages/nodejs-user-agent/webc/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nx/vite:test",
+      "outputs": ["coverage/packages/nodejs-user-agent/webc"],
+      "options": {
+        "passWithNoTests": false,
+        "coverage": true,
+        "reportsDirectory": "../../../coverage/packages/nodejs-user-agent/webc"
+      },
+      "configurations": {
+        "ci": {
+          "ci": true,
+          "codeCoverage": true
+        }
+      }
+    }
+  },
+  "tags": []
+}

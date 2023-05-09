@@ -1,0 +1,43 @@
+{
+  "name": "nodejs-remark",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/nodejs/remark/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/packages/nodejs/remark",
+        "main": "packages/nodejs/remark/src/index.ts",
+        "tsConfig": "packages/nodejs/remark/tsconfig.lib.json",
+        "assets": ["packages/nodejs/remark/*.md"]
+      }
+    },
+    "publish": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node tools/scripts/publish.mjs nodejs-remark {args.ver} {args.tag}",
+        "args": "--ver='0.0.8' --tag='latest'"
+      },
+      "dependsOn": ["build"]
+    },
+    "lint": {
+      "executor": "@nx/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["packages/nodejs/remark/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nx/vite:test",
+      "outputs": ["coverage/packages/nodejs/remark"],
+      "options": {
+        "passWithNoTests": false,
+        "coverage": true,
+        "reportsDirectory": "../../../coverage/packages/nodejs/remark"
+      }
+    }
+  },
+  "tags": []
+}

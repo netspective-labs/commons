@@ -1,0 +1,24 @@
+# Ignore source files and development files
+src/
+*.ts
+*.tsx
+*.map
+*.d.ts
+*.spec.ts
+*.spec.tsx
+*.test.ts
+*.test.tsx
+jest.config.js
+tsconfig.json
+
+# Ignore version control files
+.gitignore
+.git/
+*/.gitignore
+
+# Ignore editor-specific files
+.vscode/
+.idea/
+*.sublime-*
+*.swp
+.DS_Store
