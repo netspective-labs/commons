@@ -63,13 +63,13 @@ In order to publish the package to _Github Packages_ you'll need to change the `
 
 ```json
 "repository": {
-    "type": "git",
-    "url": "git+https://github.com/<OWNER>/<REPO>/<PACKAGE_NAME>.git",
-    "directory": "path/to/your/package"
-  },
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
-  }
+  "type": "git",
+  "url": "git+https://github.com/<OWNER>/<REPO>/<PACKAGE_NAME>.git",
+  "directory": "path/to/your/package"
+},
+"publishConfig": {
+  "registry": "https://npm.pkg.github.com"
+}
 ```
 
 - Add the `repository` property with an object with the properties seen above.
