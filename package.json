@@ -8,6 +8,7 @@
     "format": "npx nx format:check --projects=\"packages/**/*\" --base=origin/main --head=HEAD",
     "format:write": "npx nx format:write --projects=\"packages/**/*\"",
     "lint": "nx affected --target lint",
+    "lint:fix": "nx affected --target lint --fix",
     "prepare": "husky install"
   },
   "private": true,

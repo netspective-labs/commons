@@ -3,11 +3,11 @@
 
 # Run format check
 echo "Running Prettier"
-npx nx format:check || exit 1
+npx nx format:check || (echo "Format check failed! Try to run 'npm run format:write' and try commiting again." && exit 1)
 
 # Run linting on affected files
 echo "Running ESLint"
-npx nx affected -t lint --quiet --parallel=3 || exit 1
+npx nx affected -t lint --quiet --parallel=3 || (echo "Lint check failed! Try to run 'npm run lint:fix' and try commiting again." && exit 1)
 
 # Run tests on affected files
 echo "Running tests"
