@@ -16,17 +16,19 @@
     "noPropertyAccessFromIndexSignature": false,
     "baseUrl": ".",
     "paths": {
-      "@mcasaresmdevz/nlc-nodejs-astro": ["packages/nodejs/astro/src/index.js"],
-      "@mcasaresmdevz/nlc-nodejs-remark": [
+      "@netspective-labs/nlc-nodejs-astro": [
+        "packages/nodejs/astro/src/index.js"
+      ],
+      "@netspective-labs/nlc-nodejs-remark": [
         "packages/nodejs/remark/src/index.ts"
       ],
-      "@mcasaresmdevz/nlc-nodejs-universal": [
+      "@netspective-labs/nlc-nodejs-universal": [
         "packages/nodejs/universal/src/index.ts"
       ],
-      "@mcasaresmdevz/nlc-nodejs-webc": [
+      "@netspective-labs/nlc-nodejs-webc": [
         "packages/nodejs-user-agent/webc/src/index.ts"
       ],
-      "mcasaresmdevz/nlc-nodejs-remarkk": [
+      "netspective-labs/nlc-nodejs-remarkk": [
         "packages/nodejs/remarkk/src/index.ts"
       ]
     }

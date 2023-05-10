@@ -1,10 +1,10 @@
 {
-  "name": "@mcasaresmdevz/nlc-nodejs-universal",
+  "name": "@netspective-labs/nlc-nodejs-universal",
   "version": "0.0.3",
   "type": "commonjs",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mcasaresmdevz/nx-commons-05/nlc-universal.git",
+    "url": "git+https://github.com/netspective-labs/commons/nlc-universal.git",
     "directory": "packages/nodejs/universal"
   },
   "publishConfig": {

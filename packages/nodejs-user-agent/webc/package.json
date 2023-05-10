@@ -1,10 +1,10 @@
 {
-  "name": "@mcasaresmdevz/nlc-webc",
+  "name": "@netspective-labs/nlc-webc",
   "version": "0.0.1",
   "type": "commonjs",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mcasaresmdevz/nx-commons-05/nlc-webc.git",
+    "url": "git+https://github.com/netspective-labs/commons/nlc-webc.git",
     "directory": "packages/nodejs-user-agent/webc"
   },
   "publishConfig": {

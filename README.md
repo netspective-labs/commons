@@ -21,10 +21,10 @@ Replace <library-name> with the desired name for your library, <directory-name> 
 - `--publishable` creates a library that can be published to an external registry (like npm), or in our case Github Packages.
 - `--importPath=\<import-path>` is the import path for your library. This should be in the format `@<scope>/<library-name>`, where `<scope>` is your npm scope (if you have one) and `<library-name>` is the name of your library in kebab-case.
 
-For example, if you want to create a library called `math-helpers` in the `nodejs` directory that can be published to npm with an import path of `@mcasaresmdevz/math-helpers`, you would run the following command:
+For example, if you want to create a library called `math-helpers` in the `nodejs` directory that can be published to npm with an import path of `@netspective-labs/math-helpers`, you would run the following command:
 
 ```bash
-npx nx generate @nx/js:library math-helpers --directory=nodejs --publishable --importPath=@mcasaresmdevz/math-helpers
+npx nx generate @nx/js:library math-helpers --directory=nodejs --publishable --importPath=@netspective-labs/math-helpers
 ```
 
 This will generate a new library in the nodejs directory of your workspace with the necessary files and configuration to get started building your library.

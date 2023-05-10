@@ -1,5 +1,5 @@
 {
-  "name": "@mcasaresmdevz/nlc-nodejs-astro",
+  "name": "@netspective-labs/nlc-nodejs-astro",
   "version": "0.0.13",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -19,7 +19,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mcasaresmdevz/nx-commons-05/nlc-astro.git",
+    "url": "git+https://github.com/netspective-labs/commons/nlc-astro.git",
     "directory": "packages/nodejs/astro"
   },
   "publishConfig": {

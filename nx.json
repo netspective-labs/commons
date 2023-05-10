@@ -1,6 +1,6 @@
 {
   "plugins": ["@nxtensions/astro"],
-  "npmScope": "mcasaresmdevz",
+  "npmScope": "netspective-labs",
   "namedInputs": {
     "default": ["{projectRoot}/**/*", "sharedGlobals"],
     "production": [
