@@ -10,7 +10,7 @@ To create a new JavaScript library using NX, follow these steps:
 2. Run the following command:
 
 ```bash
-npx nx generate @nx/js:library <library-name> --directory=<directory-name> --publishable --importPath=<import-path>
+npx nx generate @nx/js:library <library-name> --directory=<directory-name> --unitTestRunner=vitest --publishable --importPath=<import-path>
 ```
 
 Replace <library-name> with the desired name for your library, <directory-name> with the directory where you want the library to be created, and <import-path> with the import path for your library. Here's an explanation of the arguments:
@@ -20,6 +20,7 @@ Replace <library-name> with the desired name for your library, <directory-name> 
 - `--directory=\<directory-name>` specifies the directory where your library will be created. This should be in camelCase (lowercase with no spaces, but with the first letter of each word capitalized).
 - `--publishable` creates a library that can be published to an external registry (like npm), or in our case Github Packages.
 - `--importPath=\<import-path>` is the import path for your library. This should be in the format `@<scope>/<library-name>`, where `<scope>` is your npm scope (if you have one) and `<library-name>` is the name of your library in kebab-case.
+- `unitTestRunner=vitest` parameter in the provided NX command allows you to specify the test runner for the generated package. Since we want to use vitest as our main testing tool we will set it to "vitest".
 
 For example, if you want to create a library called `math-helpers` in the `nodejs` directory that can be published to npm with an import path of `@netspective-labs/math-helpers`, you would run the following command:
 
@@ -28,6 +29,19 @@ npx nx generate @nx/js:library math-helpers --directory=nodejs --publishable --i
 ```
 
 This will generate a new library in the nodejs directory of your workspace with the necessary files and configuration to get started building your library.
+
+### Test package options
+
+To ensure that all packages have unit tests, we need to enforce failure when running the test target for packages without any tests. Additionally, we want to implement Code Coverage to track the percentage of code covered by unit tests.
+
+To set this up, you need to add two parameters, namely `passWithNoTests: false` and `coverage: true`, in the `test` target within the project.json file. These settings will help maintain test coverage and identify packages lacking tests during the test execution process.
+
+```json
+"options": {
+  "passWithNoTests": false,
+  "coverage": true,
+},
+```
 
 ### Building package
 
