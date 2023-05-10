@@ -1,4 +1,17 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-npx lint-staged
+# Run format check
+echo "Running Prettier"
+npx nx format:check || exit 1
+
+# Run linting on affected files
+echo "Running ESLint"
+npx nx affected -t lint --quiet --parallel=3 || exit 1
+
+# Run tests on affected files
+echo "Running tests"
+npx nx affected -t test --parallel=3 --configuration=ci || exit 1
+
+# Run lint-staged
+npx lint-staged || exit 1
