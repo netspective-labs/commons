@@ -48,7 +48,6 @@ Replace `<project>` with the name of the project you want to build. You can find
 In order to publish the package to _Github Packages_ you'll need to change the `package.json` that's located at the root of it.
 
 ```json
-"type": "module",
 "repository": {
     "type": "git",
     "url": "git+https://github.com/<OWNER>/<REPO>/<PACKAGE_NAME>.git",
@@ -59,7 +58,6 @@ In order to publish the package to _Github Packages_ you'll need to change the `
   }
 ```
 
-- Change the `type` property and set it to _module_.
 - Add the `repository` property with an object with the properties seen above.
 
   An example of a valid `url` value would be:
