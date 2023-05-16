@@ -29,21 +29,21 @@ const erJobHub = dvg.hubTable("er_job", {
 });
 
 const erEntityHubSat = erEntityHub.satelliteTable("er_entity_attribute", {
+  sat_er_entity_er_entity_attribute_id: primaryKey(),
   hub_er_entity_id: erEntityHub.references.hub_er_entity_id(),
   name: text(),
   address: text(),
   phone: text(),
-  ...dvg.housekeeping.columns,
-  sat_er_entity_er_entity_attribute_id: primaryKey(),
+  ...dvg.housekeeping.columns
 });
 
 const erJobHubSat = erJobHub.satelliteTable("er_job_state", {
+  sat_er_job_er_job_state_id: primaryKey(),
+  hub_er_job_id: erJobHub.references.hub_er_job_id(),
   algorithm_id: integer(),
   run_date_time: date(),
   status: text(),
   ...dvg.housekeeping.columns,
-  hub_er_job_id: erJobHub.references.hub_er_job_id(),
-  sat_er_job_er_job_state_id: primaryKey(),
 });
 
 const erEntityMatchLink = dvg.linkTable("er_entity_match", {
@@ -57,27 +57,27 @@ const erEntityMatchLink = dvg.linkTable("er_entity_match", {
 const erEntityMatchLevenshteinLinkSat = erEntityMatchLink.satelliteTable(
   "er_entity_match_levenshtien",
   {
+    sat_er_entity_match_er_entity_match_levenshtien_id: primaryKey(),
+    link_er_entity_match_id: erEntityMatchLink.references
+      .link_er_entity_match_id(),
     distance_value: integer(),
     similarity_score: integer(),
     normalized_distance: integer(),
     notes: text(),
     ...dvg.housekeeping.columns,
-    sat_er_entity_match_er_entity_match_levenshtien_id: primaryKey(),
-    link_er_entity_match_id: erEntityMatchLink.references
-      .link_er_entity_match_id(),
   },
 );
 
 const erEntityMatchSoundexLinkSat = erEntityMatchLink.satelliteTable(
   "er_entity_match_soundex",
   {
+    sat_er_entity_match_er_entity_match_soundex_id: primaryKey(),
+    link_er_entity_match_id: erEntityMatchLink.references
+      .link_er_entity_match_id(),
     code: text(),
     similarity_score: integer(),
     index: integer(),
     ...dvg.housekeeping.columns,
-    sat_er_entity_match_er_entity_match_soundex_id: primaryKey(),
-    link_er_entity_match_id: erEntityMatchLink.references
-      .link_er_entity_match_id(),
   },
 );
 
