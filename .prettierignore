@@ -2,3 +2,6 @@
 /dist
 /coverage
 /src
+
+# Deno NPM
+packages/deno/*/npm/
