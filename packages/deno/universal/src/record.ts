@@ -4,28 +4,36 @@
 export type UntypedObject = object;
 export type UntypedTabularRecordObject = UntypedObject;
 
-export type SnakeToCamelCase<S extends string> = S extends
-  `${infer P1}_${infer P2}${infer P3}`
-  ? `${Lowercase<P1>}${Uppercase<P2>}${SnakeToCamelCase<P3>}`
-  : Lowercase<S>;
+export type SnakeToCamelCase<S extends string> =
+  S extends `${infer P1}_${infer P2}${infer P3}`
+    ? `${Lowercase<P1>}${Uppercase<P2>}${SnakeToCamelCase<P3>}`
+    : Lowercase<S>;
 
-export type CamelToSnakeCase<S extends string> = S extends
-  `${infer T}${infer U}`
-  ? `${T extends Capitalize<T> ? "_" : ""}${Lowercase<T>}${CamelToSnakeCase<U>}`
-  : S;
+export type CamelToSnakeCase<S extends string> =
+  S extends `${infer T}${infer U}`
+    ? `${T extends Capitalize<T>
+        ? "_"
+        : ""}${Lowercase<T>}${CamelToSnakeCase<U>}`
+    : S;
 
 // deep, 1:1 mapping of a SQL table-like object to its camelCase JS counterpart
 export type TabularRecordToObject<T> = {
-  [K in keyof T as SnakeToCamelCase<string & K>]: T[K] extends Date ? T[K]
-    // deno-lint-ignore ban-types
-    : (T[K] extends object ? TabularRecordToObject<T[K]> : T[K]);
+  [K in keyof T as SnakeToCamelCase<string & K>]: T[K] extends Date
+    ? T[K]
+    : // deno-lint-ignore ban-types
+    T[K] extends object
+    ? TabularRecordToObject<T[K]>
+    : T[K];
 };
 
 // deep, 1:1 mapping of a camelCase JS object to its snake_case SQL-like counterpart
 export type ObjectToTabularRecord<T> = {
-  [K in keyof T as CamelToSnakeCase<string & K>]: T[K] extends Date ? T[K]
-    // deno-lint-ignore ban-types
-    : (T[K] extends object ? ObjectToTabularRecord<T[K]> : T[K]);
+  [K in keyof T as CamelToSnakeCase<string & K>]: T[K] extends Date
+    ? T[K]
+    : // deno-lint-ignore ban-types
+    T[K] extends object
+    ? ObjectToTabularRecord<T[K]>
+    : T[K];
 };
 
 export type ValueTransformer<Value, Result> = (value: Value) => Result;
@@ -103,10 +111,7 @@ export type FilterOrTransformText<
 
 export interface TransformTabularRecordOptions<
   TableRecord extends UntypedTabularRecordObject,
-  TableObject extends TabularRecordToObject<TableRecord> =
-    TabularRecordToObject<
-      TableRecord
-    >,
+  TableObject extends TabularRecordToObject<TableRecord> = TabularRecordToObject<TableRecord>,
   PropertyName extends keyof TableObject = keyof TableObject,
   ColumnName extends keyof TableRecord = keyof TableRecord,
 > {
@@ -142,56 +147,43 @@ export const camelToSnakeCase = (str: string) =>
  */
 export function transformTabularRecord<
   TableRecord extends UntypedTabularRecordObject,
-  TableObject extends TabularRecordToObject<TableRecord> =
-    TabularRecordToObject<
-      TableRecord
-    >,
+  TableObject extends TabularRecordToObject<TableRecord> = TabularRecordToObject<TableRecord>,
 >(
   o: TableObject,
   rowState?: TransformTabularRecordsRowState<TableRecord>,
   options?: TransformTabularRecordOptions<TableRecord>,
 ): TableRecord {
-  const {
-    filterColumn,
-    filterProp,
-    filterPropUnsafe,
-    transformColumn,
-  } = options ?? {};
-  const filterPropertyName =
-    (filterProp || filterPropUnsafe) as FilterOrTransformText<TableRecord>;
+  const { filterColumn, filterProp, filterPropUnsafe, transformColumn } =
+    options ?? {};
+  const filterPropertyName = (filterProp ||
+    filterPropUnsafe) as FilterOrTransformText<TableRecord>;
   const columnTV = transformColumn
     ? (transformColumn as {
-      [key: string]: (value: unknown) => unknown;
-    })
+        [key: string]: (value: unknown) => unknown;
+      })
     : undefined;
-  const result = Object.entries(o).reduce(
-    (row, kv) => {
-      const propName = filterPropertyName
-        ? (filterPropertyName(kv[0], rowState))
-        : kv[0];
-      if (propName) {
-        const snakeCasePropName = camelToSnakeCase(propName);
-        const colName = filterColumn
-          ? ((filterColumn as FilterOrTransformText<TableRecord>)(
+  const result = Object.entries(o).reduce((row, kv) => {
+    const propName = filterPropertyName
+      ? filterPropertyName(kv[0], rowState)
+      : kv[0];
+    if (propName) {
+      const snakeCasePropName = camelToSnakeCase(propName);
+      const colName = filterColumn
+        ? (filterColumn as FilterOrTransformText<TableRecord>)(
             snakeCasePropName,
-          ))
-          : snakeCasePropName;
-        if (colName) {
-          const value = kv[1];
-          if (columnTV && colName in columnTV) {
-            row[colName] = columnTV[colName](value);
-          } else {
-            row[colName] = value;
-          }
+          )
+        : snakeCasePropName;
+      if (colName) {
+        const value = kv[1];
+        if (columnTV && colName in columnTV) {
+          row[colName] = columnTV[colName](value);
+        } else {
+          row[colName] = value;
         }
       }
-      return row;
-    },
-    (options?.defaultValues?.(o, rowState) ?? {}) as Record<
-      string,
-      unknown
-    >,
-  ) as TableRecord;
+    }
+    return row;
+  }, (options?.defaultValues?.(o, rowState) ?? {}) as Record<string, unknown>) as TableRecord;
   return options?.transformRecord ? options?.transformRecord(result) : result;
 }
 
@@ -206,10 +198,7 @@ export function transformTabularRecord<
 export function transformTabularRecords<
   // deno-lint-ignore ban-types
   TableRecord extends object,
-  TableObject extends TabularRecordToObject<TableRecord> =
-    TabularRecordToObject<
-      TableRecord
-    >,
+  TableObject extends TabularRecordToObject<TableRecord> = TabularRecordToObject<TableRecord>,
 >(
   records: Iterable<TableObject>,
   options?: TransformTabularRecordOptions<TableRecord>,

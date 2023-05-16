@@ -6,7 +6,7 @@ type EmitContext = typeof ctx;
 
 const stso = SQLa.typicalSqlTextSupplierOptions<EmitContext>();
 const dvg = dvp.dataVaultGovn<EmitContext>(stso);
-const { text, textNullable, integer, integerNullable, date } = dvg.domains;
+const { text, integer, date } = dvg.domains;
 const { ulidPrimaryKey: primaryKey } = dvg.keys;
 
 const erEntityHub = dvg.hubTable("er_entity", {

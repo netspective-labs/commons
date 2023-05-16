@@ -14,7 +14,8 @@ export function unindentWhitespace(
 }
 
 export function singleLineTrim(text: string): string {
-  return text.replace(/(\r\n|\n|\r)/gm, "")
+  return text
+    .replace(/(\r\n|\n|\r)/gm, "")
     .replace(/\s+(?=(?:[^\'"]*[\'"][^\'"]*[\'"])*[^\'"]*$)/g, " ")
     .trim();
 }

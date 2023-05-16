@@ -11,10 +11,9 @@ export interface TestSubType extends TestType {
 
 export type TestTypeArray = TestType[];
 
-const [isTestType, isTestTypeArray] = mod.typeGuards<
-  TestType,
-  TestTypeArray
->("testPropName");
+const [isTestType, isTestTypeArray] = mod.typeGuards<TestType, TestTypeArray>(
+  "testPropName",
+);
 
 const isTestSubType = mod.subTypeGuard<TestType, TestSubType>(
   isTestType,
@@ -66,22 +65,18 @@ Deno.test(`multiple types guard`, () => {
 
 Deno.test(`type array guard`, () => {
   ta.assert(
-    isTestTypeArray(
-      [
-        { testPropName: "test prop value 1" },
-        { testPropName: "test prop value 2" },
-        { testPropName: "test prop value 3" },
-      ],
-    ),
+    isTestTypeArray([
+      { testPropName: "test prop value 1" },
+      { testPropName: "test prop value 2" },
+      { testPropName: "test prop value 3" },
+    ]),
   );
   ta.assert(
-    !isTestTypeArray(
-      [
-        { testPropName: "test prop value 1" },
-        { testPropName: "test prop value 2" },
-        { wrongPropName: "test prop value 3" },
-      ],
-    ),
+    !isTestTypeArray([
+      { testPropName: "test prop value 1" },
+      { testPropName: "test prop value 2" },
+      { wrongPropName: "test prop value 3" },
+    ]),
   );
 });
 
@@ -92,10 +87,7 @@ interface StronglyTyped {
   required: string;
 }
 
-type FlagOrNumeric = mod.RequireAtLeastOne<
-  StronglyTyped,
-  "flag" | "numeric"
->;
+type FlagOrNumeric = mod.RequireAtLeastOne<StronglyTyped, "flag" | "numeric">;
 
 Deno.test(`RequireAtLeastOne<StronglyTyped>`, () => {
   const withFlag: FlagOrNumeric = {
