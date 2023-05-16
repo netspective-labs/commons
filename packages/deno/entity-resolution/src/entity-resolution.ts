@@ -48,8 +48,8 @@ const erJobHubSat = erJobHub.satelliteTable("er_job_state", {
 
 const erEntityMatchLink = dvg.linkTable("er_entity_match", {
   link_er_entity_match_id: primaryKey(),
-  hub_entity_id: erEntityHubSat.references
-    .sat_er_entity_er_entity_attribute_id(),
+  hub_entity_id:
+    erEntityHubSat.references.sat_er_entity_er_entity_attribute_id(),
   algorithm_ref: erAlgorithmLookupTable.references.algorithm_id(),
   ...dvg.housekeeping.columns,
 });
@@ -63,8 +63,8 @@ const erEntityMatchLevenshteinLinkSat = erEntityMatchLink.satelliteTable(
     notes: text(),
     ...dvg.housekeeping.columns,
     sat_er_entity_match_er_entity_match_levenshtien_id: primaryKey(),
-    link_er_entity_match_id: erEntityMatchLink.references
-      .link_er_entity_match_id(),
+    link_er_entity_match_id:
+      erEntityMatchLink.references.link_er_entity_match_id(),
   },
 );
 
@@ -76,8 +76,8 @@ const erEntityMatchSoundexLinkSat = erEntityMatchLink.satelliteTable(
     index: integer(),
     ...dvg.housekeeping.columns,
     sat_er_entity_match_er_entity_match_soundex_id: primaryKey(),
-    link_er_entity_match_id: erEntityMatchLink.references
-      .link_er_entity_match_id(),
+    link_er_entity_match_id:
+      erEntityMatchLink.references.link_er_entity_match_id(),
   },
 );
 

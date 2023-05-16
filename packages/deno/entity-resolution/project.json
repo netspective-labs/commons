@@ -1,0 +1,24 @@
+{
+  "name": "deno-entity-resolution",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/deno/entity-resolution",
+  "projectType": "library",
+  "targets": {
+    "test": {
+      "executor": "@nx/deno:test",
+      "outputs": ["coverage/packages/deno/entity-resolution"],
+      "options": {
+        "coverageDirectory": "coverage/packages/deno/entity-resolution",
+        "denoConfig": "packages/deno/entity-resolution/deno.json",
+        "check": "local"
+      }
+    },
+    "lint": {
+      "executor": "@nx/deno:lint",
+      "options": {
+        "denoConfig": "packages/deno/entity-resolution/deno.json"
+      }
+    }
+  },
+  "tags": []
+}

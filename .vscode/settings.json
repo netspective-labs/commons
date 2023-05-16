@@ -1,4 +1,11 @@
 {
   "editor.formatOnSave": true,
-  "editor.defaultFormatter": "esbenp.prettier-vscode"
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "deno.enablePaths": [
+    "packages/universal",
+    "packages/deno/universal",
+    "packages/deno/entity-resolution"
+  ],
+  "deno.unstable": true,
+  "deno.importMap": "./import_map.json"
 }

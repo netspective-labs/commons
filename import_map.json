@@ -1,0 +1,7 @@
+{
+  "imports": {
+    "@netspective-labs/universal": "./packages/universal/mod.ts",
+    "@netspective-labs/deno-universal": "./packages/deno/universal/mod.ts",
+    "@netspective-labs/deno-entity-resolution": "./packages/deno/entity-resolution/mod.ts"
+  }
+}

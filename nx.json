@@ -1,5 +1,5 @@
 {
-  "plugins": ["@nxtensions/astro"],
+  "plugins": ["@nxtensions/astro", "@nx/deno"],
   "npmScope": "netspective-labs",
   "namedInputs": {
     "default": ["{projectRoot}/**/*", "sharedGlobals"],
