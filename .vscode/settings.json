@@ -4,8 +4,10 @@
   "deno.enablePaths": [
     "packages/universal",
     "packages/deno/universal",
-    "packages/deno/entity-resolution"
+    "packages/deno/entity-resolution",
+    "packages/deno"
   ],
   "deno.unstable": true,
-  "deno.importMap": "./import_map.json"
+  "deno.importMap": "./import_map.json",
+  "deno.enable": true
 }

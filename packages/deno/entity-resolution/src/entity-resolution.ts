@@ -1,5 +1,10 @@
-import * as SQLa from "https://raw.githubusercontent.com/netspective-labs/sql-aide/main/render/mod.ts";
-import * as dvp from "https://raw.githubusercontent.com/netspective-labs/sql-aide/main/pattern/data-vault.ts";
+import { Command } from "https://deno.land/x/cliffy@v0.25.7/command/mod.ts";
+import * as SQLa from "https://raw.githubusercontent.com/netspective-labs/sql-aide/v0.0.5/render/mod.ts";
+import * as dvp from "https://raw.githubusercontent.com/netspective-labs/sql-aide/v0.0.5/pattern/data-vault.ts";
+import * as dia from "https://raw.githubusercontent.com/netspective-labs/sql-aide/v0.0.5/render/diagram/plantuml-ie-notation.ts";
+
+// deno-lint-ignore no-explicit-any
+type Any = any; // make it easy on linter
 
 const ctx = SQLa.typicalSqlEmitContext();
 type EmitContext = typeof ctx;
@@ -29,21 +34,21 @@ const erJobHub = dvg.hubTable("er_job", {
 });
 
 const erEntityHubSat = erEntityHub.satelliteTable("er_entity_attribute", {
+  sat_er_entity_er_entity_attribute_id: primaryKey(),
   hub_er_entity_id: erEntityHub.references.hub_er_entity_id(),
   name: text(),
   address: text(),
   phone: text(),
   ...dvg.housekeeping.columns,
-  sat_er_entity_er_entity_attribute_id: primaryKey(),
 });
 
 const erJobHubSat = erJobHub.satelliteTable("er_job_state", {
+  sat_er_job_er_job_state_id: primaryKey(),
+  hub_er_job_id: erJobHub.references.hub_er_job_id(),
   algorithm_id: integer(),
   run_date_time: date(),
   status: text(),
   ...dvg.housekeeping.columns,
-  hub_er_job_id: erJobHub.references.hub_er_job_id(),
-  sat_er_job_er_job_state_id: primaryKey(),
 });
 
 const erEntityMatchLink = dvg.linkTable("er_entity_match", {
@@ -71,21 +76,22 @@ const erEntityMatchLevenshteinLinkSat = erEntityMatchLink.satelliteTable(
 const erEntityMatchSoundexLinkSat = erEntityMatchLink.satelliteTable(
   "er_entity_match_soundex",
   {
+    sat_er_entity_match_er_entity_match_soundex_id: primaryKey(),
+    link_er_entity_match_id:
+      erEntityMatchLink.references.link_er_entity_match_id(),
     code: text(),
     similarity_score: integer(),
     index: integer(),
     ...dvg.housekeeping.columns,
-    sat_er_entity_match_er_entity_match_soundex_id: primaryKey(),
-    link_er_entity_match_id:
-      erEntityMatchLink.references.link_er_entity_match_id(),
   },
 );
 
-/**
- * Template which generates schema objects when none exist; other templates
- * should be defined for schema migrations.
- */
-const seedDDL = SQLa.SQL<EmitContext>(stso)`
+function handleSQL(_options?: { dest?: string | undefined }) {
+  /**
+   * Template which generates schema objects when none exist; other templates
+   * should be defined for schema migrations.
+   */
+  const seedDDL = SQLa.SQL<EmitContext>(stso)`
 ${erAlgorithmLookupTable}
 
 ${erEntityHub}
@@ -99,5 +105,41 @@ ${erEntityMatchLink}
 ${erEntityMatchLevenshteinLinkSat}
 
 ${erEntityMatchSoundexLinkSat}`;
+  console.log(seedDDL.SQL(ctx));
+}
 
-console.log(seedDDL.SQL(ctx));
+function handleDiagram(_options?: { dest?: string | undefined }) {
+  const pumlERD = dia.plantUmlIE(
+    ctx,
+    function* () {
+      yield erAlgorithmLookupTable.graphEntityDefn();
+      yield erEntityHub.graphEntityDefn();
+      yield erJobHub.graphEntityDefn();
+      yield erEntityMatchLink.graphEntityDefn();
+      yield erEntityMatchLevenshteinLinkSat.graphEntityDefn();
+      yield erEntityMatchSoundexLinkSat.graphEntityDefn();
+    },
+    dia.typicalPlantUmlIeOptions(),
+  );
+  console.log(pumlERD.content);
+}
+
+// deno-fmt-ignore
+await new Command()
+  .name("er-dv-sqla")
+  .version("0.0.1")
+  .description("Entity Resolution Data Vault SQL Aide")
+  .action(() => handleSQL())
+  .command("sql", "Emit SQL")
+  .option(
+    "-d, --dest <file:string>",
+    "Output destination, STDOUT if not supplied",
+  )
+  .action((options: Any) => handleSQL(options))
+  .command("diagram", "Emit Diagram")
+  .option(
+    "-d, --dest <file:string>",
+    "Output destination, STDOUT if not supplied",
+  )
+  .action((options: Any) => handleDiagram(options))
+  .parse(Deno.args);
