@@ -1,1 +1,1 @@
-export * from "./src/entity-resolution.ts";
+export * from "./er-dv-schema.ts";
