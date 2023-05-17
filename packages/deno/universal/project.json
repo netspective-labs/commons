@@ -4,6 +4,18 @@
   "sourceRoot": "packages/deno/universal",
   "projectType": "library",
   "targets": {
+    "check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cd packages/deno/universal && deno fmt --check"
+      }
+    },
+    "format": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cd packages/deno/universal && deno fmt"
+      }
+    },
     "build": {
       "executor": "nx:run-commands",
       "options": {
