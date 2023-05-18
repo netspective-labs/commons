@@ -3,7 +3,7 @@ import * as ws from "https://raw.githubusercontent.com/netspective-labs/sql-aide
 import * as SQLa from "https://raw.githubusercontent.com/netspective-labs/sql-aide/v0.0.9/render/mod.ts";
 import * as dvp from "https://raw.githubusercontent.com/netspective-labs/sql-aide/v0.0.9/pattern/data-vault.ts";
 
-  const ctx = SQLa.typicalSqlEmitContext();
+const ctx = SQLa.typicalSqlEmitContext();
 type EmitContext = typeof ctx;
 
 const dvts = dvp.dataVaultTemplateState<EmitContext>();
