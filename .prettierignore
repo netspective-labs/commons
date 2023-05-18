@@ -5,3 +5,4 @@
 
 # Deno NPM
 packages/deno/*/npm/
+packages/deno/opsfolio/core

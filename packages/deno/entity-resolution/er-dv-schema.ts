@@ -3,7 +3,7 @@ import * as ws from "https://raw.githubusercontent.com/netspective-labs/sql-aide
 import * as SQLa from "https://raw.githubusercontent.com/netspective-labs/sql-aide/v0.0.9/render/mod.ts";
 import * as dvp from "https://raw.githubusercontent.com/netspective-labs/sql-aide/v0.0.9/pattern/data-vault.ts";
 
-const ctx = SQLa.typicalSqlEmitContext();
+  const ctx = SQLa.typicalSqlEmitContext();
 type EmitContext = typeof ctx;
 
 const dvts = dvp.dataVaultTemplateState<EmitContext>();
@@ -49,8 +49,8 @@ const erJobHubSat = erJobHub.satelliteTable("er_job_state", {
 
 const erEntityMatchLink = dvts.linkTable("er_entity_match", {
   link_er_entity_match_id: primaryKey(),
-  hub_entity_id: erEntityHubSat.references
-    .sat_er_entity_er_entity_attribute_id(),
+  hub_entity_id:
+    erEntityHubSat.references.sat_er_entity_er_entity_attribute_id(),
   algorithm_ref: erAlgorithmLookupTable.references.algorithm_id(),
   ...dvts.housekeeping.columns,
 });
@@ -59,8 +59,8 @@ const erEntityMatchLevenshteinLinkSat = erEntityMatchLink.satelliteTable(
   "er_entity_match_levenshtien",
   {
     sat_er_entity_match_er_entity_match_levenshtien_id: primaryKey(),
-    link_er_entity_match_id: erEntityMatchLink.references
-      .link_er_entity_match_id(),
+    link_er_entity_match_id:
+      erEntityMatchLink.references.link_er_entity_match_id(),
     distance_value: integer(),
     similarity_score: integer(),
     normalized_distance: integer(),
@@ -73,8 +73,8 @@ const erEntityMatchSoundexLinkSat = erEntityMatchLink.satelliteTable(
   "er_entity_match_soundex",
   {
     sat_er_entity_match_er_entity_match_soundex_id: primaryKey(),
-    link_er_entity_match_id: erEntityMatchLink.references
-      .link_er_entity_match_id(),
+    link_er_entity_match_id:
+      erEntityMatchLink.references.link_er_entity_match_id(),
     code: text(),
     similarity_score: integer(),
     index: integer(),
@@ -82,22 +82,28 @@ const erEntityMatchSoundexLinkSat = erEntityMatchLink.satelliteTable(
   },
 );
 
-function sqlDDL(options: {
-  destroyFirst?: boolean;
-  schemaName?: string;
-} = {}) {
+function sqlDDL(
+  options: {
+    destroyFirst?: boolean;
+    schemaName?: string;
+  } = {},
+) {
   const { destroyFirst, schemaName } = options;
 
   // NOTE: every time the template is "executed" it will fill out tables, views
   //       in dvts.tablesDeclared, etc.
   // deno-fmt-ignore
   return SQLa.SQL<EmitContext>(dvts.ddlOptions)`
-    ${ destroyFirst && schemaName
-       ? `drop schema if exists ${schemaName} cascade;`
-       : "-- not destroying first (for development)" }
-    ${ schemaName
-       ? `create schema if not exists ${schemaName};`
-       : "-- no schemaName provided" }
+    ${
+      destroyFirst && schemaName
+        ? `drop schema if exists ${schemaName} cascade;`
+        : "-- not destroying first (for development)"
+    }
+    ${
+      schemaName
+        ? `create schema if not exists ${schemaName};`
+        : "-- no schemaName provided"
+    }
 
     ${erAlgorithmLookupTable}
 
@@ -114,16 +120,18 @@ function sqlDDL(options: {
     ${erEntityMatchSoundexLinkSat}`;
 }
 
-function handleSqlCmd(options: {
-  dest?: string | undefined;
-  destroyFirst?: boolean;
-  schemaName?: string;
-} = {}) {
+function handleSqlCmd(
+  options: {
+    dest?: string | undefined;
+    destroyFirst?: boolean;
+    schemaName?: string;
+  } = {},
+) {
   const output = ws.unindentWhitespace(sqlDDL(options).SQL(ctx));
-  if(options.dest) { 
-    Deno.writeTextFileSync(options.dest, output) 
+  if (options.dest) {
+    Deno.writeTextFileSync(options.dest, output);
   } else {
-    console.log(output)
+    console.log(output);
   }
 }
 
@@ -136,21 +144,33 @@ await new cli.Command()
   .command("help", new cli.HelpCommand().global())
   .command("completions", new cli.CompletionsCommand())
   .command("sql", "Emit SQL")
-    .option("-d, --dest <file:string>", "Output destination, STDOUT if not supplied")
-    .option("--destroy-first", "Include SQL to destroy existing objects first (dangerous but useful for development)")
-    .option("--schema-name <schemaName:string>", "If destroying or creating a schema, this is the name of the schema")
-    .action((options) => handleSqlCmd(options))
+  .option(
+    "-d, --dest <file:string>",
+    "Output destination, STDOUT if not supplied",
+  )
+  .option(
+    "--destroy-first",
+    "Include SQL to destroy existing objects first (dangerous but useful for development)",
+  )
+  .option(
+    "--schema-name <schemaName:string>",
+    "If destroying or creating a schema, this is the name of the schema",
+  )
+  .action((options) => handleSqlCmd(options))
   .command("diagram", "Emit Diagram")
-    .option("-d, --dest <file:string>", "Output destination, STDOUT if not supplied")
-    .action((options) => {
-      // "executing" the following will fill dvts.tablesDeclared but we don't
-      // care about the SQL output, just the state management (tablesDeclared)
-      sqlDDL().SQL(ctx);
-      const pumlERD = dvts.pumlERD(ctx).content;
-      if(options.dest) { 
-        Deno.writeTextFileSync(options.dest, pumlERD) 
-      } else {
-        console.log(pumlERD)
-      }
-    })
-    .parse(Deno.args);
+  .option(
+    "-d, --dest <file:string>",
+    "Output destination, STDOUT if not supplied",
+  )
+  .action((options) => {
+    // "executing" the following will fill dvts.tablesDeclared but we don't
+    // care about the SQL output, just the state management (tablesDeclared)
+    sqlDDL().SQL(ctx);
+    const pumlERD = dvts.pumlERD(ctx).content;
+    if (options.dest) {
+      Deno.writeTextFileSync(options.dest, pumlERD);
+    } else {
+      console.log(pumlERD);
+    }
+  })
+  .parse(Deno.args);
