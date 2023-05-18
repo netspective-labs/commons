@@ -16,6 +16,9 @@ jobs:
       - uses: nrwl/nx-set-shas@v3
       - run: npm ci --legacy-peer-deps
 
+      - name: Configure npm registry authentication
+        run: npm config set "//npm.pkg.github.com/:_authToken" ${{ secrets.NPM_TOKEN }}
+
       - run: npx nx format:check
       - run: npx nx affected -t lint --quiet --parallel=3
       - run: npx nx affected -t test --parallel=3 --configuration=ci
