@@ -1,8 +1,7 @@
 import * as cli from "https://deno.land/x/cliffy@v0.25.7/command/mod.ts";
-import * as ws from "https://raw.githubusercontent.com/netspective-labs/sql-aide/v0.0.7/lib/universal/whitespace.ts";
-import * as SQLa from "https://raw.githubusercontent.com/netspective-labs/sql-aide/v0.0.7/render/mod.ts";
-import * as dvp from "https://raw.githubusercontent.com/netspective-labs/sql-aide/v0.0.7/pattern/data-vault.ts";
-import * as dia from "https://raw.githubusercontent.com/netspective-labs/sql-aide/v0.0.7/render/diagram/plantuml-ie-notation.ts";
+import * as ws from "https://raw.githubusercontent.com/netspective-labs/sql-aide/v0.0.9/lib/universal/whitespace.ts";
+import * as SQLa from "https://raw.githubusercontent.com/netspective-labs/sql-aide/v0.0.9/render/mod.ts";
+import * as dvp from "https://raw.githubusercontent.com/netspective-labs/sql-aide/v0.0.9/pattern/data-vault.ts";
 
 const ctx = SQLa.typicalSqlEmitContext();
 type EmitContext = typeof ctx;
@@ -115,28 +114,17 @@ function sqlDDL(options: {
     ${erEntityMatchSoundexLinkSat}`;
 }
 
-function handleSQL(options: {
+function handleSqlCmd(options: {
   dest?: string | undefined;
   destroyFirst?: boolean;
   schemaName?: string;
 } = {}) {
-  console.log(ws.unindentWhitespace(sqlDDL(options).SQL(ctx)));
-}
-
-function handleDiagram(_options: {
-  dest?: string | undefined;
-} = {}) {
-  // "executing" the following will fill dvts.tablesDeclared but we don't
-  // care about the SQL output, just the state management
-  sqlDDL().SQL(ctx);
-  const pumlERD = dia.plantUmlIE(ctx, function* () {
-    for (const table of dvts.tablesDeclared) {
-      if (SQLa.isGraphEntityDefinitionSupplier(table)) {
-        yield table.graphEntityDefn();
-      }
-    }
-  }, dia.typicalPlantUmlIeOptions());
-  console.log(pumlERD.content);
+  const output = ws.unindentWhitespace(sqlDDL(options).SQL(ctx));
+  if(options.dest) { 
+    Deno.writeTextFileSync(options.dest, output) 
+  } else {
+    console.log(output)
+  }
 }
 
 // deno-fmt-ignore (so that command indents don't get reformatted)
@@ -144,15 +132,25 @@ await new cli.Command()
   .name("er-dv-sqla")
   .version("0.0.2")
   .description("Entity Resolution Data Vault SQL Aide")
-  .action(() => handleSQL())
+  .action(() => handleSqlCmd())
   .command("help", new cli.HelpCommand().global())
   .command("completions", new cli.CompletionsCommand())
   .command("sql", "Emit SQL")
-    .option("-d, --dest <file:string>", "TODO: Output destination, STDOUT if not supplied")
+    .option("-d, --dest <file:string>", "Output destination, STDOUT if not supplied")
     .option("--destroy-first", "Include SQL to destroy existing objects first (dangerous but useful for development)")
     .option("--schema-name <schemaName:string>", "If destroying or creating a schema, this is the name of the schema")
-    .action((options) => handleSQL(options))
+    .action((options) => handleSqlCmd(options))
   .command("diagram", "Emit Diagram")
-    .option("-d, --dest <file:string>", "TODO: Output destination, STDOUT if not supplied")
-    .action((options) => handleDiagram(options))
+    .option("-d, --dest <file:string>", "Output destination, STDOUT if not supplied")
+    .action((options) => {
+      // "executing" the following will fill dvts.tablesDeclared but we don't
+      // care about the SQL output, just the state management (tablesDeclared)
+      sqlDDL().SQL(ctx);
+      const pumlERD = dvts.pumlERD(ctx).content;
+      if(options.dest) { 
+        Deno.writeTextFileSync(options.dest, pumlERD) 
+      } else {
+        console.log(pumlERD)
+      }
+    })
     .parse(Deno.args);
