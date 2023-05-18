@@ -18,7 +18,7 @@
       "executor": "nx:run-commands",
       "options": {
         "command": "node tools/scripts/publish.mjs nodejs-remark {args.ver} {args.tag}",
-        "args": "--ver='0.0.8' --tag='latest'"
+        "args": "--ver='0.0.2' --tag='latest'"
       },
       "dependsOn": ["build"]
     },
