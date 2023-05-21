@@ -1,30 +1,15 @@
-import * as cli from "https://deno.land/x/cliffy@v0.25.7/command/mod.ts";
-import * as ws from "https://raw.githubusercontent.com/netspective-labs/sql-aide/v0.0.9/lib/universal/whitespace.ts";
-import * as SQLa from "https://raw.githubusercontent.com/netspective-labs/sql-aide/v0.0.9/render/mod.ts";
-import * as dvp from "https://raw.githubusercontent.com/netspective-labs/sql-aide/v0.0.9/pattern/data-vault.ts";
-import * as mod from "https://raw.githubusercontent.com/netspective-labs/sql-aide/v0.0.9/pattern/typical.ts";
+#!/usr/bin/env -S deno run --allow-all
+
+import * as tp from "https://raw.githubusercontent.com/netspective-labs/sql-aide/v0.0.12/pattern/typical/mod.ts";
+const { SQLa, ws } = tp;
 
 const ctx = SQLa.typicalSqlEmitContext();
 type EmitContext = typeof ctx;
 
-const dvts = dvp.dataVaultTemplateState<EmitContext>();
-const { text, integer, date, textNullable } = dvts.domains;
-const { ulidPrimaryKey: primaryKey } = dvts.keys;
-
-// deno-lint-ignore no-empty-interface
-interface SyntheticTmplContext extends SQLa.SqlEmitContext {
-}
-
-// deno-lint-ignore no-empty-interface
-interface Context extends SQLa.SqlEmitContext {
-}
-
-const gts = mod.governedTemplateState<
-  mod.GovernedDomain,
-  SyntheticTmplContext
->();
-
-const gm = mod.governedModel<mod.GovernedDomain, Context>(gts.ddlOptions);
+const gts = tp.governedTemplateState<tp.GovernedDomain,EmitContext>();
+const gm = tp.governedModel<tp.GovernedDomain, EmitContext>(gts.ddlOptions);
+const { text, textNullable, integer, date } = gm.domains;
+const { ulidPrimaryKey: primaryKey } = gm.keys;
 
 export enum ExecutionContext {
   DEVELOPMENT, // code is text, value is a number
@@ -760,30 +745,26 @@ const graphNature = gm.textEnumTable(
     { isIdempotent: true },
 );
 
-const graph = SQLa.tableDefinition("graph", {
+const graph = gm.textPkTable("graph", {
   graph_id: primaryKey(),
   graph_nature_id: graphNature.references.code(),
   name:text(),
   description:textNullable(),
-  ...dvts.housekeeping.columns,
+  ...gm.housekeeping.columns,
 });
 
-const host = SQLa.tableDefinition("host", {
+const host = gm.textPkTable("host", {
   host_id: primaryKey(),
   host_name: text(),
   description:textNullable(),
-  ...dvts.housekeeping.columns,
+  ...gm.housekeeping.columns,
 });
 
-const hostBoundary = SQLa.tableDefinition("host_boundary", {
+const hostBoundary = gm.textPkTable("host_boundary", {
   host_boundary_id: primaryKey(),
   host_id: host.references.host_id(),
-  ...dvts.housekeeping.columns,
+  ...gm.housekeeping.columns,
 })
-
-
-
-
 
 function sqlDDL(options: {
   destroyFirst?: boolean;
@@ -792,99 +773,65 @@ function sqlDDL(options: {
   const { destroyFirst, schemaName } = options;
 
   // NOTE: every time the template is "executed" it will fill out tables, views
-  //       in dvts.tablesDeclared, etc.
+  //       in gm.tablesDeclared, etc.
   // deno-fmt-ignore
-  return SQLa.SQL<EmitContext>(dvts.ddlOptions)`
-    ${ destroyFirst && schemaName
-       ? `drop schema if exists ${schemaName} cascade;`
-       : "-- not destroying first (for development)" }
-    ${ schemaName
-       ? `create schema if not exists ${schemaName};`
-       : "-- no schemaName provided" }
-
-      ${execCtx}
-      ${organizationRoleType}
-      ${partyType}
-      ${partyRole}
-      ${contractStatus}
-      ${paymentType}
-      ${periodicity}
-      ${boundaryNature}
-      ${timeEntryCategory}
-      ${raciMatrixSubject}
-      ${raciMatrixAssignmentNature}
-      ${skillNature}
-      ${skill}
-      ${proficiencyScale}
-      ${vulnerabilityStatus}
-      ${assetStatus}
-      ${assetType}
-      ${assignment}
-      ${probability}
-      ${threatSourceType}
-      ${threatEventType}
-      ${calendarPeriod}
-      ${comparisonOperator}
-      ${kpiMeasurementType}
-      ${kpiStatus}
-      ${trackingPeriod}
-      ${trend}
-      ${auditorType}
-      ${auditPurpose}
-      ${auditorStatusType}
-      ${ethernetInterfaceType}
-      ${partyRelationType}
-      ${partyIdentifierType}
-      ${personType}
-      ${contactType}
-      ${trainingSubject}
-      ${statusValues}
-      ${ratingValue}
-      ${contractType}
-      ${graphNature}
-      ${graph}
-      ${host}
-      ${hostBoundary}
+  return SQLa.SQL<EmitContext>(gts.ddlOptions)`
+    ${execCtx}
+    ${organizationRoleType}
+    ${partyType}
+    ${partyRole}
+    ${contractStatus}
+    ${paymentType}
+    ${periodicity}
+    ${boundaryNature}
+    ${timeEntryCategory}
+    ${raciMatrixSubject}
+    ${raciMatrixAssignmentNature}
+    ${skillNature}
+    ${skill}
+    ${proficiencyScale}
+    ${vulnerabilityStatus}
+    ${assetStatus}
+    ${assetType}
+    ${assignment}
+    ${probability}
+    ${threatSourceType}
+    ${threatEventType}
+    ${calendarPeriod}
+    ${comparisonOperator}
+    ${kpiMeasurementType}
+    ${kpiStatus}
+    ${trackingPeriod}
+    ${trend}
+    ${auditorType}
+    ${auditPurpose}
+    ${auditorStatusType}
+    ${ethernetInterfaceType}
+    ${partyRelationType}
+    ${partyIdentifierType}
+    ${personType}
+    ${contactType}
+    ${trainingSubject}
+    ${statusValues}
+    ${ratingValue}
+    ${contractType}
+    ${graphNature}
+    ${graph}
+    ${host}
+    ${hostBoundary}
+    
+    ${execCtx.seedDML}
     `;
 }
 
-function handleSqlCmd(options: {
-  dest?: string | undefined;
-  destroyFirst?: boolean;
-  schemaName?: string;
-} = {}) {
-  const output = ws.unindentWhitespace(sqlDDL(options).SQL(ctx));
-  if (options.dest) {
-    Deno.writeTextFileSync(options.dest, output);
-  } else {
-    console.log(output);
-  }
-}
-
-// deno-fmt-ignore (so that command indents don't get reformatted)
-await new cli.Command()
-  .name("er-dv-sqla")
-  .version("0.0.2")
-  .description("Entity Resolution Data Vault SQL Aide")
-  .action(() => handleSqlCmd())
-  .command("help", new cli.HelpCommand().global())
-  .command("completions", new cli.CompletionsCommand())
-  .command("sql", "Emit SQL")
-    .option("-d, --dest <file:string>", "Output destination, STDOUT if not supplied")
-    .option("--destroy-first", "Include SQL to destroy existing objects first (dangerous but useful for development)")
-    .option("--schema-name <schemaName:string>", "If destroying or creating a schema, this is the name of the schema")
-    .action((options) => handleSqlCmd(options))
-  .command("diagram", "Emit Diagram")
-    .option("-d, --dest <file:string>", "Output destination, STDOUT if not supplied")
-    .action((options) => {
-      // "executing" the following will fill dvts.tablesDeclared but we don't
-      // care about the SQL output, just the state management (tablesDeclared)
-      sqlDDL().SQL(ctx);
-      const pumlERD = dvts.pumlERD(ctx).content;
-      if(options.dest) {
-        Deno.writeTextFileSync(options.dest, pumlERD)
-      } else {
-        console.log(pumlERD)
-      }
-    })
-    .parse(Deno.args);
+tp.typicalCLI({
+  resolve: (specifier) =>
+    specifier ? import.meta.resolve(specifier) : import.meta.url,
+  prepareSQL: (options) => ws.unindentWhitespace(sqlDDL(options).SQL(ctx)),
+  prepareDiagram: () => {
+    // "executing" the following will fill gm.tablesDeclared but we don't
+    // care about the SQL output, just the state management (tablesDeclared)
+    sqlDDL().SQL(ctx);
+    return gts.pumlERD(ctx).content;
+  },
+}).commands.parse(Deno.args);
