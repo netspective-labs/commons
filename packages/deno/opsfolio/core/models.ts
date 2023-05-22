@@ -756,6 +756,8 @@ const graph = gm.textPkTable("graph", {
 const boundaryId = primaryKey();
 const boundary = gm.textPkTable("boundary", {
   boundary_id: boundaryId,
+  // TODO: add self-ref foregin key
+  // parent_boundary_id: SQLa.selfRefForeignKeyNullable(boundaryId),
   graph_id: graph.references.graph_id(),
   boundary_nature_id: boundaryNature.references.code(),
   name: text(),
