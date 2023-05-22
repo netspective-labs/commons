@@ -1,13 +1,13 @@
 #!/usr/bin/env -S deno run --allow-all
 
-import * as dvp from "https://raw.githubusercontent.com/netspective-labs/sql-aide/v0.0.12/pattern/data-vault/mod.ts";
+import * as dvp from "https://raw.githubusercontent.com/netspective-labs/sql-aide/v0.0.13/pattern/data-vault/mod.ts";
 const { typical: typ, typical: { SQLa, ws } } = dvp;
 
-const ctx = SQLa.typicalSqlEmitContext();
+const ctx = SQLa.typicalSqlEmitContext({ sqlDialect: SQLa.postgreSqlDialect() });
 type EmitContext = typeof ctx;
 
 const dvts = dvp.dataVaultTemplateState<EmitContext>();
-const { text, integer, date } = dvts.domains;
+const { text, integer, date, float } = dvts.domains;
 const { ulidPrimaryKey: primaryKey } = dvts.keys;
 
 const erEntityHub = dvts.hubTable("er_entity", {
@@ -20,7 +20,7 @@ const erAlgorithmLookupTable = SQLa.tableDefinition("er_algorithm", {
   algorithm_id: primaryKey(),
   algorithm_name: text(),
   algorithm_version: text(),
-  algorithm_sp: text(),
+  algorithm_sp: text(),  
 });
 
 const erJobHub = dvts.hubTable("er_job", {
@@ -52,6 +52,7 @@ const erEntityMatchLink = dvts.linkTable("er_entity_match", {
   hub_entity_id:
     erEntityHubSat.references.sat_er_entity_er_entity_attribute_id(),
   algorithm_ref: erAlgorithmLookupTable.references.algorithm_id(),
+  score: float(),
   ...dvts.housekeeping.columns,
 });
 
