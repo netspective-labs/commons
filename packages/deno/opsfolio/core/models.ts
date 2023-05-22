@@ -8,7 +8,7 @@ type EmitContext = typeof ctx;
 
 const gts = tp.governedTemplateState<tp.GovernedDomain,EmitContext>();
 const gm = tp.governedModel<tp.GovernedDomain, EmitContext>(gts.ddlOptions);
-const { text, textNullable, integer, date } = gm.domains;
+const { text, textNullable, integer, date, dateNullable, dateTime } = gm.domains;
 const { ulidPrimaryKey: primaryKey } = gm.keys;
 
 export enum ExecutionContext {
@@ -753,6 +753,16 @@ const graph = gm.textPkTable("graph", {
   ...gm.housekeeping.columns,
 });
 
+const boundaryId = primaryKey();
+const boundary = gm.textPkTable("boundary", {
+  boundary_id: boundaryId,
+  graph_id: graph.references.graph_id(),
+  boundary_nature_id: boundaryNature.references.code(),
+  name: text(),
+  description:textNullable(),
+  ...gm.housekeeping.columns,
+});
+
 const host = gm.textPkTable("host", {
   host_id: primaryKey(),
   host_name: text(),
@@ -765,6 +775,146 @@ const hostBoundary = gm.textPkTable("host_boundary", {
   host_id: host.references.host_id(),
   ...gm.housekeeping.columns,
 })
+
+const raciMatrix = gm.textPkTable("raci_matrix", {
+  raci_matrix_id: primaryKey(),
+  asset: text(),
+  responsible: text(),
+  accountable: text(),
+  consulted: text(),
+  informed: text(),
+  ...gm.housekeeping.columns,
+})
+
+const raciMatrixSubjectBoundary = gm.textPkTable("raci_matrix_subject_boundary", {
+  raci_matrix_subject_boundary_id: primaryKey(),
+  boundary_id: boundary.references.boundary_id(),
+  raci_matrix_subject_id: raciMatrixSubject.references.code(),
+  ...gm.housekeeping.columns,
+})
+
+const raciMatrixActivity = gm.textPkTable("raci_matrix_activity", {
+  raci_matrix_activity_id: primaryKey(),
+  activity: text(),
+  ...gm.housekeeping.columns,
+})
+
+const party = SQLa.tableDefinition("party", {
+  party_id: primaryKey(),
+  party_type_id: partyType.references.code(),
+  party_name: text(),
+  ...gm.housekeeping.columns,
+});
+
+/**
+  * Reference URL: https://help.salesforce.com/s/articleView?id=sf.c360_a_partyidentification_object.htm&type=5
+*/
+
+const partyIdentifier = SQLa.tableDefinition("party_identifier", {
+  party_identifier_id: primaryKey(),
+  identifier_number: text(),
+  party_identifier_type_id: partyIdentifierType.references.code(),
+  party_id: party.references.party_id(),
+  ...gm.housekeeping.columns,
+});
+
+const person = SQLa.tableDefinition("person", {
+  person_id: primaryKey(),
+  party_id: party.references.party_id(),
+  person_type_id: personType.references.code(),
+  person_first_name: text(),
+  person_last_name: text(),
+  ...gm.housekeeping.columns,
+});
+
+/**
+   * Reference URL: https://docs.oracle.com/cd/E29633_01/CDMRF/GUID-F52E49F4-AE6F-4FF5-8EEB-8366A66AF7E9.htm
+*/
+
+const partyRelation = SQLa.tableDefinition("party_relation", {
+  party_relation_id: primaryKey(),
+  party_id: party.references.party_id(),
+  related_party_id: party.references.party_id(),
+  relation_type_id: partyRelationType.references.code(),
+  party_role_id: partyRole.references.code(),
+  ...gm.housekeeping.columns,
+});
+
+const organization = SQLa.tableDefinition("organization", {
+  organization_id: primaryKey(),
+  party_id: party.references.party_id(),
+  name: text(),
+  license: text(),
+  registration_date:date(),
+  ...gm.housekeeping.columns,
+});
+
+const organizationRole = SQLa.tableDefinition("organization_role", {
+  organization_role_id: primaryKey(),
+  person_id: person.references.person_id(),
+  organization_id: organization.references.organization_id(),
+  organization_role_type_id: organizationRoleType.references.code(),
+  ...gm.housekeeping.columns,
+});
+
+const contactElectronic = SQLa.tableDefinition("contact_electronic", {
+  contact_electronic_id: primaryKey(),
+  contact_type_id: contactType.references.code(),
+  party_id: party.references.party_id(),
+  electronics_details: text(),
+  ...gm.housekeeping.columns,
+});
+
+const contactLand = SQLa.tableDefinition("contact_land", {
+  contact_land_id: primaryKey(),
+  contact_type_id: contactType.references.code(),
+  party_id: party.references.party_id(),
+  address_line1: text(),
+  address_line2: text(),
+  address_zip: text(),
+  address_city: text(),
+  address_state: text(),
+  address_country: text(),
+  ...gm.housekeeping.columns,
+});
+
+ /**
+   * Reference URL: https://docs.microfocus.com/UCMDB/11.0/cp-docs/docs/eng/class_model/html/index.html
+   */
+
+const asset = SQLa.tableDefinition("asset", {
+  asset_id: primaryKey(),
+  organization_id: organization.references.organization_id(),
+  asset_retired_date: dateNullable(),
+  asset_status_id: assetStatus.references.code(),
+  asset_tag: text(),
+  name: text(),
+  description: text(),
+  asset_type_id: assetType.references.code(),
+  asset_workload_category: text(),
+  assignment_id: assignment.references.code(),
+  barcode_or_rfid_tag: text(),
+  installed_date: dateNullable(),
+  planned_retirement_date: dateNullable(),
+  purchase_delivery_date: dateNullable(),
+  purchase_order_date: dateNullable(),
+  purchase_request_date: dateNullable(),
+  serial_number: text(),
+  tco_amount: text(),
+  tco_currency: text(),
+  ...gm.housekeeping.columns,
+});
+
+const billing = SQLa.tableDefinition("billing", {
+  billing_id: primaryKey(),
+  purpose: text(),
+    bill_rate: text(),
+    period: text(),
+    effective_from_date: dateTime(),
+    effective_to_date: text(),
+    prorate: integer(),
+  ...gm.housekeeping.columns,
+});
 
 function sqlDDL(options: {
   destroyFirst?: boolean;
@@ -819,8 +969,59 @@ function sqlDDL(options: {
     ${graph}
     ${host}
     ${hostBoundary}
-    
+    ${raciMatrix}
+    ${raciMatrixSubjectBoundary}
+    ${raciMatrixActivity}
+    ${party}
+    ${partyIdentifier}
+    ${person}
+    ${partyRelation}
+    ${organization}
+    ${organizationRole}
+    ${contactElectronic}
+    ${contactLand}
+    ${asset}
+    ${billing}
+
     ${execCtx.seedDML}
+    ${organizationRoleType.seedDML}
+    ${partyType.seedDML}
+    ${partyRole.seedDML}
+    ${contractStatus.seedDML}
+    ${paymentType.seedDML}
+    ${periodicity.seedDML}
+    ${boundaryNature.seedDML}
+    ${timeEntryCategory.seedDML}
+    ${raciMatrixSubject.seedDML}
+    ${raciMatrixAssignmentNature.seedDML}
+    ${skillNature.seedDML}
+    ${skill.seedDML}
+    ${proficiencyScale.seedDML}
+    ${vulnerabilityStatus.seedDML}
+    ${assetStatus.seedDML}
+    ${assetType.seedDML}
+    ${assignment.seedDML}
+    ${probability.seedDML}
+    ${threatSourceType.seedDML}
+    ${calendarPeriod.seedDML}
+    ${comparisonOperator.seedDML}
+    ${kpiMeasurementType.seedDML}
+    ${kpiStatus.seedDML}
+    ${trackingPeriod.seedDML}
+    ${trend.seedDML}
+    ${auditorType.seedDML}
+    ${auditPurpose.seedDML}
+    ${auditorStatusType.seedDML}
+    ${ethernetInterfaceType.seedDML}
+    ${partyIdentifierType.seedDML}
+    ${partyRelationType.seedDML}
+    ${personType.seedDML}
+    ${contactType.seedDML}
+    ${trainingSubject.seedDML}
+    ${statusValues.seedDML}
+    ${ratingValue.seedDML}
+    ${contractType.seedDML}
+    ${graphNature .seedDML}
     `;
 }
 
