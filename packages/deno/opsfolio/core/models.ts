@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run --allow-all
 
-import * as tp from "https://raw.githubusercontent.com/netspective-labs/sql-aide/v0.0.12/pattern/typical/mod.ts";
+import * as tp from "https://raw.githubusercontent.com/netspective-labs/sql-aide/v0.0.14/pattern/typical/mod.ts";
 const { SQLa, ws } = tp;
 
 const ctx = SQLa.typicalSqlEmitContext();
@@ -8,7 +8,7 @@ type EmitContext = typeof ctx;
 
 const gts = tp.governedTemplateState<tp.GovernedDomain,EmitContext>();
 const gm = tp.governedModel<tp.GovernedDomain, EmitContext>(gts.ddlOptions);
-const { text, textNullable, integer, date, dateNullable, dateTime } = gm.domains;
+const { text, textNullable, integer, date, dateNullable, dateTime, selfRef } = gm.domains;
 const { ulidPrimaryKey: primaryKey } = gm.keys;
 
 export enum ExecutionContext {
@@ -753,11 +753,10 @@ const graph = gm.textPkTable("graph", {
   ...gm.housekeeping.columns,
 });
 
-const boundaryId = primaryKey();
+const boundary_id = primaryKey();
 const boundary = gm.textPkTable("boundary", {
-  boundary_id: boundaryId,
-  // TODO: add self-ref foregin key
-  // parent_boundary_id: SQLa.selfRefForeignKeyNullable(boundaryId),
+  boundary_id,
+  parent_boundary_id: selfRef(boundary_id),
   graph_id: graph.references.graph_id(),
   boundary_nature_id: boundaryNature.references.code(),
   name: text(),
@@ -918,12 +917,7 @@ const billing = SQLa.tableDefinition("billing", {
   ...gm.housekeeping.columns,
 });
 
-function sqlDDL(options: {
-  destroyFirst?: boolean;
-  schemaName?: string;
-} = {}) {
-  const { destroyFirst, schemaName } = options;
-
+function sqlDDL() {
   // NOTE: every time the template is "executed" it will fill out tables, views
   //       in gm.tablesDeclared, etc.
   // deno-fmt-ignore
@@ -969,6 +963,7 @@ function sqlDDL(options: {
     ${contractType}
     ${graphNature}
     ${graph}
+    ${boundary}
     ${host}
     ${hostBoundary}
     ${raciMatrix}
@@ -1030,7 +1025,7 @@ function sqlDDL(options: {
 tp.typicalCLI({
   resolve: (specifier) =>
     specifier ? import.meta.resolve(specifier) : import.meta.url,
-  prepareSQL: (options) => ws.unindentWhitespace(sqlDDL(options).SQL(ctx)),
+  prepareSQL: () => ws.unindentWhitespace(sqlDDL().SQL(ctx)),
   prepareDiagram: () => {
     // "executing" the following will fill gm.tablesDeclared but we don't
     // care about the SQL output, just the state management (tablesDeclared)
