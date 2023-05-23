@@ -800,7 +800,7 @@ const raciMatrixActivity = gm.textPkTable("raci_matrix_activity", {
   ...gm.housekeeping.columns,
 })
 
-const party = SQLa.tableDefinition("party", {
+const party = gm.textPkTable("party", {
   party_id: primaryKey(),
   party_type_id: partyType.references.code(),
   party_name: text(),
@@ -811,7 +811,7 @@ const party = SQLa.tableDefinition("party", {
   * Reference URL: https://help.salesforce.com/s/articleView?id=sf.c360_a_partyidentification_object.htm&type=5
 */
 
-const partyIdentifier = SQLa.tableDefinition("party_identifier", {
+const partyIdentifier = gm.textPkTable("party_identifier", {
   party_identifier_id: primaryKey(),
   identifier_number: text(),
   party_identifier_type_id: partyIdentifierType.references.code(),
@@ -819,7 +819,7 @@ const partyIdentifier = SQLa.tableDefinition("party_identifier", {
   ...gm.housekeeping.columns,
 });
 
-const person = SQLa.tableDefinition("person", {
+const person = gm.textPkTable("person", {
   person_id: primaryKey(),
   party_id: party.references.party_id(),
   person_type_id: personType.references.code(),
@@ -832,7 +832,7 @@ const person = SQLa.tableDefinition("person", {
    * Reference URL: https://docs.oracle.com/cd/E29633_01/CDMRF/GUID-F52E49F4-AE6F-4FF5-8EEB-8366A66AF7E9.htm
 */
 
-const partyRelation = SQLa.tableDefinition("party_relation", {
+const partyRelation = gm.textPkTable("party_relation", {
   party_relation_id: primaryKey(),
   party_id: party.references.party_id(),
   related_party_id: party.references.party_id(),
@@ -841,7 +841,7 @@ const partyRelation = SQLa.tableDefinition("party_relation", {
   ...gm.housekeeping.columns,
 });
 
-const organization = SQLa.tableDefinition("organization", {
+const organization = gm.textPkTable("organization", {
   organization_id: primaryKey(),
   party_id: party.references.party_id(),
   name: text(),
@@ -850,7 +850,7 @@ const organization = SQLa.tableDefinition("organization", {
   ...gm.housekeeping.columns,
 });
 
-const organizationRole = SQLa.tableDefinition("organization_role", {
+const organizationRole = gm.textPkTable("organization_role", {
   organization_role_id: primaryKey(),
   person_id: person.references.person_id(),
   organization_id: organization.references.organization_id(),
@@ -858,7 +858,7 @@ const organizationRole = SQLa.tableDefinition("organization_role", {
   ...gm.housekeeping.columns,
 });
 
-const contactElectronic = SQLa.tableDefinition("contact_electronic", {
+const contactElectronic = gm.textPkTable("contact_electronic", {
   contact_electronic_id: primaryKey(),
   contact_type_id: contactType.references.code(),
   party_id: party.references.party_id(),
@@ -866,7 +866,7 @@ const contactElectronic = SQLa.tableDefinition("contact_electronic", {
   ...gm.housekeeping.columns,
 });
 
-const contactLand = SQLa.tableDefinition("contact_land", {
+const contactLand = gm.textPkTable("contact_land", {
   contact_land_id: primaryKey(),
   contact_type_id: contactType.references.code(),
   party_id: party.references.party_id(),
@@ -883,7 +883,7 @@ const contactLand = SQLa.tableDefinition("contact_land", {
    * Reference URL: https://docs.microfocus.com/UCMDB/11.0/cp-docs/docs/eng/class_model/html/index.html
    */
 
-const asset = SQLa.tableDefinition("asset", {
+const asset = gm.textPkTable("asset", {
   asset_id: primaryKey(),
   organization_id: organization.references.organization_id(),
   asset_retired_date: dateNullable(),
@@ -906,7 +906,7 @@ const asset = SQLa.tableDefinition("asset", {
   ...gm.housekeeping.columns,
 });
 
-const billing = SQLa.tableDefinition("billing", {
+const billing = gm.textPkTable("billing", {
   billing_id: primaryKey(),
   purpose: text(),
     bill_rate: text(),
@@ -1023,7 +1023,7 @@ function sqlDDL() {
 }
 
 tp.typicalCLI({
-  resolve: (specifier) =>
+  resolve: (specifier?: string) =>
     specifier ? import.meta.resolve(specifier) : import.meta.url,
   prepareSQL: () => ws.unindentWhitespace(sqlDDL().SQL(ctx)),
   prepareDiagram: () => {
