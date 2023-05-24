@@ -3,13 +3,13 @@
 import * as tp from "https://raw.githubusercontent.com/netspective-labs/sql-aide/v0.0.14/pattern/typical/mod.ts";
 const { SQLa, ws } = tp;
 
-const ctx = SQLa.typicalSqlEmitContext();
+export const ctx = SQLa.typicalSqlEmitContext();
 type EmitContext = typeof ctx;
 
 const gts = tp.governedTemplateState<tp.GovernedDomain,EmitContext>();
 const gm = tp.governedModel<tp.GovernedDomain, EmitContext>(gts.ddlOptions);
 const { text, textNullable, integer, date, dateNullable, dateTime, selfRef } = gm.domains;
-const { ulidPrimaryKey: primaryKey } = gm.keys;
+const { ulidPrimaryKey: primaryKey, autoIncPrimaryKey:autoIncPK } = gm.keys;
 
 export enum ExecutionContext {
   DEVELOPMENT, // code is text, value is a number
@@ -745,16 +745,16 @@ const graphNature = gm.textEnumTable(
     { isIdempotent: true },
 );
 
-const graph = gm.textPkTable("graph", {
-  graph_id: primaryKey(),
+export const graph = gm.autoIncPkTable("graph", {
+  graph_id: autoIncPK(),
   graph_nature_id: graphNature.references.code(),
   name:text(),
   description:textNullable(),
   ...gm.housekeeping.columns,
 });
 
-const boundary_id = primaryKey();
-const boundary = gm.textPkTable("boundary", {
+const boundary_id = autoIncPK();
+const boundary = gm.autoIncPkTable("boundary", {
   boundary_id,
   parent_boundary_id: selfRef(boundary_id),
   graph_id: graph.references.graph_id(),
@@ -764,21 +764,21 @@ const boundary = gm.textPkTable("boundary", {
   ...gm.housekeeping.columns,
 });
 
-const host = gm.textPkTable("host", {
-  host_id: primaryKey(),
+const host = gm.autoIncPkTable("host", {
+  host_id: autoIncPK(),
   host_name: text(),
   description:textNullable(),
   ...gm.housekeeping.columns,
 });
 
-const hostBoundary = gm.textPkTable("host_boundary", {
-  host_boundary_id: primaryKey(),
+const hostBoundary = gm.autoIncPkTable("host_boundary", {
+  host_boundary_id: autoIncPK(),
   host_id: host.references.host_id(),
   ...gm.housekeeping.columns,
 })
 
-const raciMatrix = gm.textPkTable("raci_matrix", {
-  raci_matrix_id: primaryKey(),
+const raciMatrix = gm.autoIncPkTable("raci_matrix", {
+  raci_matrix_id: autoIncPK(),
   asset: text(),
   responsible: text(),
   accountable: text(),
@@ -787,21 +787,21 @@ const raciMatrix = gm.textPkTable("raci_matrix", {
   ...gm.housekeeping.columns,
 })
 
-const raciMatrixSubjectBoundary = gm.textPkTable("raci_matrix_subject_boundary", {
-  raci_matrix_subject_boundary_id: primaryKey(),
+const raciMatrixSubjectBoundary = gm.autoIncPkTable("raci_matrix_subject_boundary", {
+  raci_matrix_subject_boundary_id: autoIncPK(),
   boundary_id: boundary.references.boundary_id(),
   raci_matrix_subject_id: raciMatrixSubject.references.code(),
   ...gm.housekeeping.columns,
 })
 
-const raciMatrixActivity = gm.textPkTable("raci_matrix_activity", {
-  raci_matrix_activity_id: primaryKey(),
+const raciMatrixActivity = gm.autoIncPkTable("raci_matrix_activity", {
+  raci_matrix_activity_id: autoIncPK(),
   activity: text(),
   ...gm.housekeeping.columns,
 })
 
-const party = gm.textPkTable("party", {
-  party_id: primaryKey(),
+const party = gm.autoIncPkTable("party", {
+  party_id: autoIncPK(),
   party_type_id: partyType.references.code(),
   party_name: text(),
   ...gm.housekeeping.columns,
@@ -811,16 +811,16 @@ const party = gm.textPkTable("party", {
   * Reference URL: https://help.salesforce.com/s/articleView?id=sf.c360_a_partyidentification_object.htm&type=5
 */
 
-const partyIdentifier = gm.textPkTable("party_identifier", {
-  party_identifier_id: primaryKey(),
+const partyIdentifier = gm.autoIncPkTable("party_identifier", {
+  party_identifier_id: autoIncPK(),
   identifier_number: text(),
   party_identifier_type_id: partyIdentifierType.references.code(),
   party_id: party.references.party_id(),
   ...gm.housekeeping.columns,
 });
 
-const person = gm.textPkTable("person", {
-  person_id: primaryKey(),
+const person = gm.autoIncPkTable("person", {
+  person_id: autoIncPK(),
   party_id: party.references.party_id(),
   person_type_id: personType.references.code(),
   person_first_name: text(),
@@ -832,8 +832,8 @@ const person = gm.textPkTable("person", {
    * Reference URL: https://docs.oracle.com/cd/E29633_01/CDMRF/GUID-F52E49F4-AE6F-4FF5-8EEB-8366A66AF7E9.htm
 */
 
-const partyRelation = gm.textPkTable("party_relation", {
-  party_relation_id: primaryKey(),
+const partyRelation = gm.autoIncPkTable("party_relation", {
+  party_relation_id: autoIncPK(),
   party_id: party.references.party_id(),
   related_party_id: party.references.party_id(),
   relation_type_id: partyRelationType.references.code(),
@@ -841,8 +841,8 @@ const partyRelation = gm.textPkTable("party_relation", {
   ...gm.housekeeping.columns,
 });
 
-const organization = gm.textPkTable("organization", {
-  organization_id: primaryKey(),
+const organization = gm.autoIncPkTable("organization", {
+  organization_id: autoIncPK(),
   party_id: party.references.party_id(),
   name: text(),
   license: text(),
@@ -850,24 +850,24 @@ const organization = gm.textPkTable("organization", {
   ...gm.housekeeping.columns,
 });
 
-const organizationRole = gm.textPkTable("organization_role", {
-  organization_role_id: primaryKey(),
+const organizationRole = gm.autoIncPkTable("organization_role", {
+  organization_role_id: autoIncPK(),
   person_id: person.references.person_id(),
   organization_id: organization.references.organization_id(),
   organization_role_type_id: organizationRoleType.references.code(),
   ...gm.housekeeping.columns,
 });
 
-const contactElectronic = gm.textPkTable("contact_electronic", {
-  contact_electronic_id: primaryKey(),
+const contactElectronic = gm.autoIncPkTable("contact_electronic", {
+  contact_electronic_id: autoIncPK(),
   contact_type_id: contactType.references.code(),
   party_id: party.references.party_id(),
   electronics_details: text(),
   ...gm.housekeeping.columns,
 });
 
-const contactLand = gm.textPkTable("contact_land", {
-  contact_land_id: primaryKey(),
+const contactLand = gm.autoIncPkTable("contact_land", {
+  contact_land_id: autoIncPK(),
   contact_type_id: contactType.references.code(),
   party_id: party.references.party_id(),
   address_line1: text(),
@@ -883,8 +883,8 @@ const contactLand = gm.textPkTable("contact_land", {
    * Reference URL: https://docs.microfocus.com/UCMDB/11.0/cp-docs/docs/eng/class_model/html/index.html
    */
 
-const asset = gm.textPkTable("asset", {
-  asset_id: primaryKey(),
+const asset = gm.autoIncPkTable("asset", {
+  asset_id: autoIncPK(),
   organization_id: organization.references.organization_id(),
   asset_retired_date: dateNullable(),
   asset_status_id: assetStatus.references.code(),
@@ -906,8 +906,8 @@ const asset = gm.textPkTable("asset", {
   ...gm.housekeeping.columns,
 });
 
-const billing = gm.textPkTable("billing", {
-  billing_id: primaryKey(),
+const billing = gm.autoIncPkTable("billing", {
+  billing_id: autoIncPK(),
   purpose: text(),
     bill_rate: text(),
     period: text(),
@@ -1021,9 +1021,9 @@ function sqlDDL() {
     ${graphNature .seedDML}
     `;
 }
-
+if(import.meta.main){
 tp.typicalCLI({
-  resolve: (specifier?: string) =>
+  resolve: (specifier) =>
     specifier ? import.meta.resolve(specifier) : import.meta.url,
   prepareSQL: () => ws.unindentWhitespace(sqlDDL().SQL(ctx)),
   prepareDiagram: () => {
@@ -1033,3 +1033,4 @@ tp.typicalCLI({
     return gts.pumlERD(ctx).content;
   },
 }).commands.parse(Deno.args);
+}
