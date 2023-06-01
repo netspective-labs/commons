@@ -8,8 +8,17 @@ type EmitContext = typeof ctx;
 
 const gts = mod.governedTemplateState<mod.GovernedDomain, EmitContext>();
 const gm = mod.governedModel<mod.GovernedDomain, EmitContext>(gts.ddlOptions);
-const { text, textNullable, integer, date, dateNullable, dateTime, selfRef } =
-  gm.domains;
+const {
+  text,
+  textNullable,
+  integer,
+  date,
+  dateNullable,
+  dateTime,
+  selfRef,
+  dateTimeNullable,
+  float,
+} = gm.domains;
 const { autoIncPrimaryKey: autoIncPK } = gm.keys;
 type Any = any;
 const tcf = SQLa.tableColumnFactory<Any, Any>();
@@ -1030,6 +1039,305 @@ const impactOfRisk = gm.autoIncPkTable("impact_of_risk", {
   ...gm.housekeeping.columns,
 });
 
+const proposedControls = gm.autoIncPkTable("proposed_controls", {
+  proposed_controls_id: autoIncPK(),
+  security_impact_analysis_id: securityImpactAnalysis.references
+    .security_impact_analysis_id(),
+  controls: text(),
+  ...gm.housekeeping.columns,
+});
+
+const billing = gm.autoIncPkTable("billing", {
+  billing_id: autoIncPK(),
+  purpose: text(),
+  bill_rate: text(),
+  period: text(),
+  effective_from_date: dateTime(),
+  effective_to_date: text(),
+  prorate: integer(),
+  ...gm.housekeeping.columns,
+});
+
+const scheduledTask = gm.autoIncPkTable("scheduled_task", {
+  scheduled_task_id: autoIncPK(),
+  description: text(),
+  task_date: dateTime(),
+  reminder_date: dateTime(),
+  assigned_to: text(),
+  reminder_to: text(),
+  ...gm.housekeeping.columns,
+});
+
+/**
+ * Reference URL: https://docs.microfocus.com/UCMDB/11.0/cp-docs/docs/eng/class_model/html/index.html
+ */
+
+const timesheet = gm.autoIncPkTable("timesheet", {
+  timesheet_id: autoIncPK(),
+  date_of_work: dateTime(),
+  is_billable_id: statusValues.references.code(),
+  number_of_hours: integer(),
+  time_entry_category_id: timeEntryCategory.references.code(),
+  timesheet_summary: text(),
+  ...gm.housekeeping.columns,
+});
+
+const certificate = gm.autoIncPkTable("certificate", {
+  certificate_id: autoIncPK(),
+  certificate_name: text(),
+  short_name: text(),
+  certificate_category: text(),
+  certificate_type: text(),
+  certificate_authority: text(),
+  validity: text(),
+  expiration_date: dateTimeNullable(),
+  domain_name: text(),
+  key_size: integer(),
+  path: text(),
+  ...gm.housekeeping.columns,
+});
+
+const device = gm.autoIncPkTable("device", {
+  device_id: autoIncPK(),
+  device_name: text(),
+  short_name: text(),
+  barcode: text(),
+  model: text(),
+  serial_number: text(),
+  firmware: text(),
+  data_center: text(),
+  location: text(),
+  purpose: text(),
+  description: text(),
+  ...gm.housekeeping.columns,
+});
+
+const securityIncidentResponseTeam = gm.autoIncPkTable(
+  "security_incident_response_team",
+  {
+    security_incident_response_team_id: autoIncPK(),
+    training_subject_id: trainingSubject.references.code(),
+    person_id: person.references.person_id(),
+    organization_id: organization.references.organization_id(),
+    training_status_id: statusValues.references.code(),
+    attended_date: date(),
+    ...gm.housekeeping.columns,
+  },
+);
+
+/**
+ * Reference URL: https://schema.org/Rating
+ */
+
+const rating = gm.autoIncPkTable(
+  "rating",
+  {
+    rating_id: autoIncPK(),
+    author_id: person.references.person_id(),
+    rating_given_to_id: organization.references.organization_id(),
+    rating_value_id: ratingValue.references.code(),
+    best_rating_id: ratingValue.references.code(),
+    rating_explanation: text(),
+    review_aspect: text(),
+    worst_rating_id: ratingValue.references.code(),
+    ...gm.housekeeping.columns,
+  },
+);
+
+const notes = gm.autoIncPkTable(
+  "note",
+  {
+    note_id: autoIncPK(),
+    party_id: party.references.party_id(),
+    note: text(),
+    ...gm.housekeeping.columns,
+  },
+);
+
+const auditAssertion = gm.autoIncPkTable(
+  "audit_assertion",
+  {
+    audit_assertion_id: autoIncPK(),
+    auditor_type_id: auditorType.references.code(),
+    audit_purpose_id: auditPurpose.references.code(),
+    auditor_org_id: organization.references.organization_id(),
+    auditor_person_id: person.references.person_id(),
+    auditor_status_type_id: auditorStatusType.references.code(),
+    scf_identifier: text(),
+    auditor_notes: text(),
+    auditor_artifacts: text(),
+    assertion_name: text(),
+    assertion_description: text(),
+    ...gm.housekeeping.columns,
+  },
+);
+
+/**
+ * Reference URL: https://learn.microsoft.com/en-us/windows/win32/wmisdk/wmi-start-page
+ */
+
+const loadAverage = gm.autoIncPkTable(
+  "load_average",
+  {
+    load_average_id: autoIncPK(),
+    load_average: float(),
+    ...gm.housekeeping.columns,
+  },
+);
+
+/**
+ * Reference URL: https://learn.microsoft.com/en-us/windows/win32/wmisdk/wmi-start-page
+ */
+
+const diskUsage = gm.autoIncPkTable(
+  "disk_usage",
+  {
+    disk_usage_id: autoIncPK(),
+    total_bytes: integer(),
+    used_bytes: integer(),
+    free_bytes: integer(),
+    percent_used: float(),
+    ...gm.housekeeping.columns,
+  },
+);
+
+/**
+ * Reference URL: https://learn.microsoft.com/en-us/windows/win32/wmisdk/wmi-start-page
+ */
+
+const networkInterface = gm.autoIncPkTable(
+  "network_interface",
+  {
+    network_interface_id: autoIncPK(),
+    name: text(),
+    ethernet_interface_id: ethernetInterfaceType.references.code(),
+    mac_address: text(),
+    ip_addresses: text(),
+    netmask: text(),
+    gateway: text(),
+    ...gm.housekeeping.columns,
+  },
+);
+
+/**
+ * Reference URL: https://learn.microsoft.com/en-us/windows/win32/wmisdk/wmi-start-page
+ */
+
+const operatingSystem = gm.autoIncPkTable(
+  "operating_system",
+  {
+    operating_system_id: autoIncPK(),
+    name: text(),
+    version: text(),
+    architecture: text(),
+    kernel_version: text(),
+    boot_time: dateTime(),
+    uptime_seconds: integer(),
+    load_average_id: loadAverage.references.load_average_id(),
+    cpu_usage_percent: float(),
+    memory_total_bytes: integer(),
+    memory_available_bytes: integer(),
+    swap_total_bytes: integer(),
+    swap_used_bytes: integer(),
+    disk_usage_id: diskUsage.references.disk_usage_id(),
+    network_interface_id: networkInterface.references
+      .network_interface_id(),
+    ...gm.housekeeping.columns,
+  },
+);
+
+/**
+ * Reference URL: https://learn.microsoft.com/en-us/windows/win32/wmisdk/wmi-start-page
+ */
+
+const cpu = gm.autoIncPkTable(
+  "cpu",
+  {
+    cpu_id: autoIncPK(),
+    name: text(),
+    cores: integer(),
+    usage_percent: float(),
+    load_average_id: loadAverage.references.load_average_id(),
+    ...gm.housekeeping.columns,
+  },
+);
+
+/**
+ * Reference URL: https://learn.microsoft.com/en-us/windows/win32/wmisdk/wmi-start-page
+ */
+
+const memory = gm.autoIncPkTable(
+  "memory",
+  {
+    memory_id: autoIncPK(),
+    total_bytes: integer(),
+    available_bytes: integer(),
+    used_percent: float(),
+    ...gm.housekeeping.columns,
+  },
+);
+
+const systemInfoMode = gm.autoIncPkTable(
+  "systeminfo_mode",
+  {
+    systeminfo_mode_id: autoIncPK(),
+    asymmetric_keys_encryption_enabled_id: statusValues.references
+      .code(),
+    symmetric_keys_encryption_enabled_id: statusValues.references
+      .code(),
+    cryptographic_key_encryption_enabled_id: statusValues.references
+      .code(),
+    mfa_2fa_enabled_id: statusValues.references.code(),
+    public_key_encryption_enabled_id: statusValues.references.code(),
+    ...gm.housekeeping.columns,
+  },
+);
+
+/**
+ * Reference URL: https://learn.microsoft.com/en-us/windows/win32/wmisdk/wmi-start-page
+ */
+
+const systemInfo = gm.autoIncPkTable(
+  "systeminfo",
+  {
+    systeminfo_id: autoIncPK(),
+    hostname: text(),
+    os_id: operatingSystem.references.operating_system_id(),
+    cpu_id: cpu.references.cpu_id(),
+    memory_id: memory.references.memory_id(),
+    platform_id: asset.references.asset_id(),
+    systeminfo_mode_id: systemInfoMode.references.systeminfo_mode_id(),
+    importance_id: severity.references.code(),
+    status_id: assetStatus.references.code(),
+    ...gm.housekeeping.columns,
+  },
+);
+
+/**
+ * Reference URL: https://docs.microfocus.com/UCMDB/11.0/cp-docs/docs/eng/class_model/html/index.html
+ */
+
+const contract = gm.autoIncPkTable(
+  "contract",
+  {
+    contract_id: autoIncPK(),
+    contract_from_id: party.references.party_id(),
+    contract_to_id: party.references.party_id(),
+    contract_status_id: contractStatus.references.code(),
+    document_reference: text(),
+    payment_type_id: paymentType.references.code(),
+    periodicity_id: periodicity.references.code(),
+    start_date: dateTime(),
+    end_date: dateTimeNullable(),
+    contract_type_id: contractType.references.code(),
+    date_of_last_review: dateTimeNullable(),
+    date_of_next_review: dateTimeNullable(),
+    date_of_contract_review: dateTimeNullable(),
+    date_of_contract_approval: dateTimeNullable(),
+    ...gm.housekeeping.columns,
+  },
+);
+
 function sqlDDL() {
   // NOTE: every time the template is "executed" it will fill out tables, views
   //       in gm.tablesDeclared, etc.
@@ -1101,6 +1409,25 @@ function sqlDDL() {
     ${priority}
     ${securityImpactAnalysis}
     ${impactOfRisk}
+    ${proposedControls}
+    ${billing}
+    ${scheduledTask}
+    ${timesheet}
+    ${certificate}
+    ${device}
+    ${securityIncidentResponseTeam}
+    ${rating}
+    ${notes}
+    ${auditAssertion}
+    ${loadAverage}
+    ${diskUsage}
+    ${networkInterface}
+    ${operatingSystem}
+    ${cpu}
+    ${memory}
+    ${systemInfoMode}
+    ${systemInfo}
+    ${contract}
 
     ${execCtx.seedDML}
     ${organizationRoleType.seedDML}
@@ -1145,7 +1472,6 @@ function sqlDDL() {
     ${severity.seedDML}
     ${assetRiskType.seedDML}
     ${priority.seedDML}
-    ${securityImpactAnalysis}
     `;
 }
 if (import.meta.main) {
