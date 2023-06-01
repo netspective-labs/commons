@@ -1,15 +1,18 @@
 #!/usr/bin/env -S deno run --allow-all
 
-import * as tp from "https://raw.githubusercontent.com/netspective-labs/sql-aide/v0.0.14/pattern/typical/mod.ts";
-const { SQLa, ws } = tp;
+import * as mod from "https://raw.githubusercontent.com/netspective-labs/sql-aide/v0.0.33/pattern/typical/mod.ts";
+const { SQLa, ws } = mod;
 
 export const ctx = SQLa.typicalSqlEmitContext();
 type EmitContext = typeof ctx;
 
-const gts = tp.governedTemplateState<tp.GovernedDomain,EmitContext>();
-const gm = tp.governedModel<tp.GovernedDomain, EmitContext>(gts.ddlOptions);
-const { text, textNullable, integer, date, dateNullable, dateTime, selfRef } = gm.domains;
-const { ulidPrimaryKey: primaryKey, autoIncPrimaryKey:autoIncPK } = gm.keys;
+const gts = mod.governedTemplateState<mod.GovernedDomain, EmitContext>();
+const gm = mod.governedModel<mod.GovernedDomain, EmitContext>(gts.ddlOptions);
+const { text, textNullable, integer, date, dateNullable, dateTime, selfRef } =
+  gm.domains;
+const { autoIncPrimaryKey: autoIncPK } = gm.keys;
+type Any = any;
+const tcf = SQLa.tableColumnFactory<Any, Any>();
 
 export enum ExecutionContext {
   DEVELOPMENT, // code is text, value is a number
@@ -509,6 +512,23 @@ export enum GraphNature {
   APP = "Application",
 }
 
+export enum Severity {
+  CRITICAL = "Critical",
+  MAJOR = "Major",
+  MINOR = "Minor",
+  LOW = "Low",
+}
+
+export enum AssetRiskType {
+  SECURITY = "Security",
+}
+
+enum Priority {
+  HIGH = "High",
+  MEDIUM = "Medium",
+  LOW = "Low",
+}
+
 const execCtx = gm.ordinalEnumTable("execution_context", ExecutionContext);
 
 const organizationRoleType = gm.textEnumTable(
@@ -655,129 +675,146 @@ const kpiStatus = gm.textEnumTable(
   { isIdempotent: true },
 );
 
- const trackingPeriod = gm.textEnumTable(
-   "tracking_period",
-    TrackingPeriod,
-    { isIdempotent: true },
+const trackingPeriod = gm.textEnumTable(
+  "tracking_period",
+  TrackingPeriod,
+  { isIdempotent: true },
 );
 
- const trend = gm.textEnumTable(
-   "trend",
-    Trend,
-    { isIdempotent: true },
+const trend = gm.textEnumTable(
+  "trend",
+  Trend,
+  { isIdempotent: true },
 );
 
- const auditorType = gm.textEnumTable(
-   "auditor_type",
-    AuditorType,
-    { isIdempotent: true },
+const auditorType = gm.textEnumTable(
+  "auditor_type",
+  AuditorType,
+  { isIdempotent: true },
 );
 
- const auditPurpose = gm.textEnumTable(
-   "audit_purpose",
-    AuditPurpose,
-    { isIdempotent: true },
+const auditPurpose = gm.textEnumTable(
+  "audit_purpose",
+  AuditPurpose,
+  { isIdempotent: true },
 );
 
 const auditorStatusType = gm.textEnumTable(
-   "audit_status",
-    AuditorStatusType,
-    { isIdempotent: true },
+  "audit_status",
+  AuditorStatusType,
+  { isIdempotent: true },
 );
 
 const ethernetInterfaceType = gm.textEnumTable(
-   "ethernet_interface",
-    EthernetInterfaceType,
-    { isIdempotent: true },
+  "ethernet_interface",
+  EthernetInterfaceType,
+  { isIdempotent: true },
 );
 
 const partyIdentifierType = gm.textEnumTable(
-   "party_identifier_type",
-    PartyIdentifierType,
-    { isIdempotent: true },
+  "party_identifier_type",
+  PartyIdentifierType,
+  { isIdempotent: true },
 );
 
 const partyRelationType = gm.textEnumTable(
-   "party_relation_type",
-    PartyRelationType,
-    { isIdempotent: true },
+  "party_relation_type",
+  PartyRelationType,
+  { isIdempotent: true },
 );
 
 const personType = gm.textEnumTable(
-   "person_type",
-    PersonType,
-    { isIdempotent: true },
+  "person_type",
+  PersonType,
+  { isIdempotent: true },
 );
 
 const contactType = gm.textEnumTable(
-   "contact_type",
-    ContactType,
-    { isIdempotent: true },
+  "contact_type",
+  ContactType,
+  { isIdempotent: true },
 );
 
 const trainingSubject = gm.textEnumTable(
-   "training_subject",
-    TrainingSubject,
-    { isIdempotent: true },
+  "training_subject",
+  TrainingSubject,
+  { isIdempotent: true },
 );
 
 const statusValues = gm.textEnumTable(
-   "status_value",
-    StatusValues,
-    { isIdempotent: true },
+  "status_value",
+  StatusValues,
+  { isIdempotent: true },
 );
 
 const ratingValue = gm.textEnumTable(
-   "rating_value",
-    RatingValue,
-    { isIdempotent: true },
+  "rating_value",
+  RatingValue,
+  { isIdempotent: true },
 );
 
 const contractType = gm.textEnumTable(
-   "contract_type",
-    ContractType,
-    { isIdempotent: true },
+  "contract_type",
+  ContractType,
+  { isIdempotent: true },
 );
 
 const graphNature = gm.textEnumTable(
-   "graph_nature",
-    GraphNature,
-    { isIdempotent: true },
+  "graph_nature",
+  GraphNature,
+  { isIdempotent: true },
+);
+
+const severity = gm.textEnumTable(
+  "severity",
+  Severity,
+  { isIdempotent: true },
+);
+
+const assetRiskType = gm.textEnumTable(
+  "asset_risk_type",
+  AssetRiskType,
+  { isIdempotent: true },
+);
+
+const priority = gm.textEnumTable(
+  "priority",
+  Priority,
+  { isIdempotent: true },
 );
 
 export const graph = gm.autoIncPkTable("graph", {
   graph_id: autoIncPK(),
-  graph_nature_id: graphNature.references.code(),
-  name:text(),
-  description:textNullable(),
+  graph_nature_code: graphNature.references.code(),
+  name: text(),
+  description: textNullable(),
   ...gm.housekeeping.columns,
 });
 
 const boundary_id = autoIncPK();
-const boundary = gm.autoIncPkTable("boundary", {
+export const boundary = gm.autoIncPkTable("boundary", {
   boundary_id,
   parent_boundary_id: selfRef(boundary_id),
-  graph_id: graph.references.graph_id(),
   boundary_nature_id: boundaryNature.references.code(),
   name: text(),
-  description:textNullable(),
+  description: textNullable(),
   ...gm.housekeeping.columns,
 });
 
-const host = gm.autoIncPkTable("host", {
+export const host = gm.autoIncPkTable("host", {
   host_id: autoIncPK(),
-  host_name: text(),
-  description:textNullable(),
+  host_name: tcf.unique(text()),
+  description: textNullable(),
   ...gm.housekeeping.columns,
 });
 
-const hostBoundary = gm.autoIncPkTable("host_boundary", {
+export const hostBoundary = gm.autoIncPkTable("host_boundary", {
   host_boundary_id: autoIncPK(),
   host_id: host.references.host_id(),
   ...gm.housekeeping.columns,
-})
+});
 
-const raciMatrix = gm.autoIncPkTable("raci_matrix", {
+export const raciMatrix = gm.autoIncPkTable("raci_matrix", {
   raci_matrix_id: autoIncPK(),
   asset: text(),
   responsible: text(),
@@ -785,22 +822,25 @@ const raciMatrix = gm.autoIncPkTable("raci_matrix", {
   consulted: text(),
   informed: text(),
   ...gm.housekeeping.columns,
-})
+});
 
-const raciMatrixSubjectBoundary = gm.autoIncPkTable("raci_matrix_subject_boundary", {
-  raci_matrix_subject_boundary_id: autoIncPK(),
-  boundary_id: boundary.references.boundary_id(),
-  raci_matrix_subject_id: raciMatrixSubject.references.code(),
-  ...gm.housekeeping.columns,
-})
+const raciMatrixSubjectBoundary = gm.autoIncPkTable(
+  "raci_matrix_subject_boundary",
+  {
+    raci_matrix_subject_boundary_id: autoIncPK(),
+    boundary_id: boundary.references.boundary_id(),
+    raci_matrix_subject_id: raciMatrixSubject.references.code(),
+    ...gm.housekeeping.columns,
+  },
+);
 
 const raciMatrixActivity = gm.autoIncPkTable("raci_matrix_activity", {
   raci_matrix_activity_id: autoIncPK(),
   activity: text(),
   ...gm.housekeeping.columns,
-})
+});
 
-const party = gm.autoIncPkTable("party", {
+export const party = gm.autoIncPkTable("party", {
   party_id: autoIncPK(),
   party_type_id: partyType.references.code(),
   party_name: text(),
@@ -808,8 +848,8 @@ const party = gm.autoIncPkTable("party", {
 });
 
 /**
-  * Reference URL: https://help.salesforce.com/s/articleView?id=sf.c360_a_partyidentification_object.htm&type=5
-*/
+ * Reference URL: https://help.salesforce.com/s/articleView?id=sf.c360_a_partyidentification_object.htm&type=5
+ */
 
 const partyIdentifier = gm.autoIncPkTable("party_identifier", {
   party_identifier_id: autoIncPK(),
@@ -829,8 +869,8 @@ const person = gm.autoIncPkTable("person", {
 });
 
 /**
-   * Reference URL: https://docs.oracle.com/cd/E29633_01/CDMRF/GUID-F52E49F4-AE6F-4FF5-8EEB-8366A66AF7E9.htm
-*/
+ * Reference URL: https://docs.oracle.com/cd/E29633_01/CDMRF/GUID-F52E49F4-AE6F-4FF5-8EEB-8366A66AF7E9.htm
+ */
 
 const partyRelation = gm.autoIncPkTable("party_relation", {
   party_relation_id: autoIncPK(),
@@ -846,7 +886,7 @@ const organization = gm.autoIncPkTable("organization", {
   party_id: party.references.party_id(),
   name: text(),
   license: text(),
-  registration_date:date(),
+  registration_date: date(),
   ...gm.housekeeping.columns,
 });
 
@@ -879,9 +919,9 @@ const contactLand = gm.autoIncPkTable("contact_land", {
   ...gm.housekeeping.columns,
 });
 
- /**
-   * Reference URL: https://docs.microfocus.com/UCMDB/11.0/cp-docs/docs/eng/class_model/html/index.html
-   */
+/**
+ * Reference URL: https://docs.microfocus.com/UCMDB/11.0/cp-docs/docs/eng/class_model/html/index.html
+ */
 
 const asset = gm.autoIncPkTable("asset", {
   asset_id: autoIncPK(),
@@ -906,14 +946,87 @@ const asset = gm.autoIncPkTable("asset", {
   ...gm.housekeeping.columns,
 });
 
-const billing = gm.autoIncPkTable("billing", {
-  billing_id: autoIncPK(),
-  purpose: text(),
-    bill_rate: text(),
-    period: text(),
-    effective_from_date: dateTime(),
-    effective_to_date: text(),
-    prorate: integer(),
+const vulnerabilitySource = gm.autoIncPkTable("vulnerability_source", {
+  vulnerability_source_id: autoIncPK(),
+  short_code: text(), // For example cve code like CVE-2019-0708 (corresponds to a flaw in Microsoft’s Remote Desktop Protocol (RDP))
+  source_url: text(),
+  description: text(),
+  ...gm.housekeeping.columns,
+});
+
+// TODO:
+// - [ ] Need add field tag if needed in future
+
+const vulnerability = gm.autoIncPkTable("vulnerability", {
+  vulnerability_id: autoIncPK(),
+  short_name: text(),
+  source_id: vulnerabilitySource.references.vulnerability_source_id(),
+  affected_software: text(),
+  reference: text(),
+  status_id: vulnerabilityStatus.references.code(),
+  patch_availability: text(),
+  severity_id: severity.references.code(),
+  solutions: text(),
+  description: text(),
+  ...gm.housekeeping.columns,
+});
+
+const threatSource = gm.autoIncPkTable("threat_source", {
+  threat_source_id: autoIncPK(),
+  title: text(),
+  identifier: text(),
+  threat_source_type_id: threatSourceType.references.code(),
+  source_of_information: text(),
+  capability: text(),
+  intent: text(),
+  targeting: text(),
+  description: text(),
+  ...gm.housekeeping.columns,
+});
+
+const threatEvent = gm.autoIncPkTable("threat_event", {
+  threat_event_id: autoIncPK(),
+  title: text(),
+  threat_source_id: threatSource.references.threat_source_id(),
+  asset_id: asset.references.asset_id(),
+  identifier: text(),
+  threat_event_type_id: threatEventType.references.code(),
+  event_classification: text(),
+  source_of_information: text(),
+  description: text(),
+  ...gm.housekeeping.columns,
+});
+
+const assetRisk = gm.autoIncPkTable("asset_risk", {
+  asset_risk_id: autoIncPK(),
+  asset_risk_type_id: assetRiskType.references.code(),
+  asset_id: asset.references.asset_id(),
+  threat_event_id: threatEvent.references.threat_event_id(),
+  relevance_id: severity.references.code(),
+  likelihood_id: probability.references.code(),
+  impact: text(),
+  ...gm.housekeeping.columns,
+});
+
+const securityImpactAnalysis = gm.autoIncPkTable("security_impact_analysis", {
+  security_impact_analysis_id: autoIncPK(),
+  vulnerability_id: vulnerability.references.vulnerability_id(),
+  asset_risk_id: assetRisk.references.asset_risk_id(),
+  risk_level_id: probability.references.code(),
+  impact_level_id: probability.references.code(),
+  existing_controls: text(),
+  priority_id: priority.references.code(),
+  reported_date: date(),
+  reported_by_id: person.references.person_id(),
+  responsible_by_id: person.references.person_id(),
+  ...gm.housekeeping.columns,
+});
+
+const impactOfRisk = gm.autoIncPkTable("impact_of_risk", {
+  impact_of_risk_id: autoIncPK(),
+  security_impact_analysis_id: securityImpactAnalysis.references
+    .security_impact_analysis_id(),
+  impact: text(),
   ...gm.housekeeping.columns,
 });
 
@@ -978,7 +1091,16 @@ function sqlDDL() {
     ${contactElectronic}
     ${contactLand}
     ${asset}
-    ${billing}
+    ${vulnerabilitySource}
+    ${severity}
+    ${vulnerability}
+    ${threatSource}
+    ${threatEvent}
+    ${assetRiskType}
+    ${assetRisk}
+    ${priority}
+    ${securityImpactAnalysis}
+    ${impactOfRisk}
 
     ${execCtx.seedDML}
     ${organizationRoleType.seedDML}
@@ -1000,6 +1122,7 @@ function sqlDDL() {
     ${assignment.seedDML}
     ${probability.seedDML}
     ${threatSourceType.seedDML}
+    ${threatEventType.seedDML}
     ${calendarPeriod.seedDML}
     ${comparisonOperator.seedDML}
     ${kpiMeasurementType.seedDML}
@@ -1018,19 +1141,23 @@ function sqlDDL() {
     ${statusValues.seedDML}
     ${ratingValue.seedDML}
     ${contractType.seedDML}
-    ${graphNature .seedDML}
+    ${graphNature.seedDML}
+    ${severity.seedDML}
+    ${assetRiskType.seedDML}
+    ${priority.seedDML}
+    ${securityImpactAnalysis}
     `;
 }
-if(import.meta.main){
-tp.typicalCLI({
-  resolve: (specifier) =>
-    specifier ? import.meta.resolve(specifier) : import.meta.url,
-  prepareSQL: () => ws.unindentWhitespace(sqlDDL().SQL(ctx)),
-  prepareDiagram: () => {
-    // "executing" the following will fill gm.tablesDeclared but we don't
-    // care about the SQL output, just the state management (tablesDeclared)
-    sqlDDL().SQL(ctx);
-    return gts.pumlERD(ctx).content;
-  },
-}).commands.parse(Deno.args);
+if (import.meta.main) {
+  mod.typicalCLI({
+    resolve: (specifier) =>
+      specifier ? import.meta.resolve(specifier) : import.meta.url,
+    prepareSQL: () => ws.unindentWhitespace(sqlDDL().SQL(ctx)),
+    prepareDiagram: () => {
+      // "executing" the following will fill gm.tablesDeclared but we don't
+      // care about the SQL output, just the state management (tablesDeclared)
+      sqlDDL().SQL(ctx);
+      return gts.pumlERD(ctx).content;
+    },
+  }).commands.parse(Deno.args);
 }
