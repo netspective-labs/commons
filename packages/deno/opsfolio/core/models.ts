@@ -538,6 +538,99 @@ enum Priority {
   LOW = "Low",
 }
 
+export enum RiskSubject {
+  TECHNICAL_RISK = "Technical Risk",
+}
+
+/**
+ * Reference URL: https://docs.microfocus.com/UCMDB/11.0/cp-docs/docs/eng/class_model/html/index.html
+ */
+
+export enum IncidentCategory {
+  ACCESS = "Access",
+  DATA = "Data",
+  FACILITIES = "Facilities",
+  FAILURE = "Failure",
+  GENERAL_INFORMATION = "General Information",
+  HARDWARE = "Hardware",
+  HOW_TO = "How To",
+  OTHER = "Other",
+  PERFORMANCE = "Performance",
+  SECURITY = "Security",
+  SERVICE_DELIVERY = "Service Delivery",
+  SERVICE_PORTFOLIO = "Service Portfolio",
+  STATUS = "Status",
+  SUPPORT = "Support",
+  THRIFTY = "Thrifty",
+}
+
+/**
+ * Reference URL: https://docs.microfocus.com/UCMDB/11.0/cp-docs/docs/eng/class_model/html/index.html
+ */
+export enum IncidentSubCategory {
+  AUTHORIZATION_ERROR = "Authorization Error",
+  AVAILABILITY = "Availability",
+  DATA_OR_FILE_CORRUPTED = "Data Or File Corrupted",
+  DATA_OR_FILE_INCORRECT = "Data Or File Incorrect",
+  DATA_OR_FILE_MISSING = "Data Or File Missing",
+  ERROR_MESSAGE = "Error Message",
+  FUNCTION_OR_FEATURE_NOT_WORKING = "Function Or Feature Not Working",
+  FUNCTIONALITY = "Functionality",
+  GENERAL_INFORMATION = "General Information",
+  HARDWARE_FAILURE = "Hardware Failure",
+  HOW_TO = "How To",
+  INCIDENT_RESOLUTION_QUALITY = "Incident Resolution Quality",
+  INCIDENT_RESOLUTION_TIME = "Incident Resolution Time",
+  JOB_FAILED = "Job Failed",
+  LOGIN_FAILURE = "Login Failure",
+  MISSING_OR_STOLEN = "Missing Or Stolen",
+  NEW_SERVICE = "New Service",
+  PERFORMANCE = "Performance",
+  PERFORMANCE_DEGRADATION = "Performance Degradation",
+  PERSON = "Person",
+  SECURITY_BREACH = "Security Breach",
+  SECURITY_EVENT = "Security Event/Message",
+  STATUS = "Status",
+  STORAGE_LIMIT_EXCEEDED = "Storage Limit Exceeded",
+  SYSTEM_DOWN = "System Down",
+  SYSTEM_OR_APPLICATION_HANGS = "System Or Application Hangs",
+  UPGRADE_NEW_RELEASE = "Upgrade/New Release",
+  VIRUS_ALERT = "Virus Alert",
+}
+
+/**
+ * Reference URL: https://docs.microfocus.com/UCMDB/11.0/cp-docs/docs/eng/class_model/html/index.html
+ */
+export enum IncidentType {
+  COMPLAINT = "Complaint",
+  INCIDENT = "Incident",
+  REQUEST_FOR_INFORMATION = "Request For Information",
+}
+
+/**
+ * Reference URL:https://docs.microfocus.com/UCMDB/11.0/cp-docs/docs/eng/class_model/html/index.html
+ */
+export enum IncidentStatus {
+  ACCEPTED = "Accepted",
+  ASSIGNED = "Assigned",
+  CANCELLED = "Cancelled",
+  CATEGORIZE = "Categorize",
+  CLOSED = "Closed",
+  OPEN = "Open",
+  PENDING_CHANGE = "Pending Change",
+  PENDING_CUSTOMER = "Pending Customer",
+  PENDING_EVIDENCE = "Pending Evidence",
+  PENDING_OTHER = "Pending Other",
+  PENDING_VENDOR = "Pending Vendor",
+  REFERRED = "Referred",
+  REJECTED = "Rejected",
+  REOPENED = "Reopened",
+  REPLACED_PROBLEM = "Replaced Problem",
+  RESOLVED = "Resolved",
+  SUSPENDED = "Suspended",
+  WORK_IN_PROGRESS = "Work In Progress",
+}
+
 const execCtx = gm.ordinalEnumTable("execution_context", ExecutionContext);
 
 const organizationRoleType = gm.textEnumTable(
@@ -789,6 +882,42 @@ const assetRiskType = gm.textEnumTable(
 const priority = gm.textEnumTable(
   "priority",
   Priority,
+  { isIdempotent: true },
+);
+
+const riskSubject = gm.textEnumTable(
+  "risk_subject",
+  RiskSubject,
+  { isIdempotent: true },
+);
+
+const riskType = gm.textEnumTable(
+  "risk_type",
+  RiskType,
+  { isIdempotent: true },
+);
+
+const incidentCategory = gm.textEnumTable(
+  "incident_category",
+  IncidentCategory,
+  { isIdempotent: true },
+);
+
+const incidentSubCategory = gm.textEnumTable(
+  "incident_sub_category",
+  IncidentSubCategory,
+  { isIdempotent: true },
+);
+
+const incidentType = gm.textEnumTable(
+  "incident_type",
+  IncidentType,
+  { isIdempotent: true },
+);
+
+const incidentStatus = gm.textEnumTable(
+  "incident_status",
+  IncidentStatus,
   { isIdempotent: true },
 );
 
@@ -1338,6 +1467,219 @@ const contract = gm.autoIncPkTable(
   },
 );
 
+const riskRegister = gm.autoIncPkTable(
+  "risk_register",
+  {
+    risk_register_id: autoIncPK(),
+    description: text(),
+    risk_subject_id: riskSubject.references.code(),
+    risk_type_id: riskType.references.code(),
+    impact_to_the_organization: text(),
+    rating_likelihood_id: ratingValue.references.code(),
+    rating_impact_id: ratingValue.references.code(),
+    rating_overall_risk_id: ratingValue.references.code(),
+    control_effectivenes_controls_in_place: text(),
+    control_effectivenes_control_effectiveness: integer(),
+    control_effectivenes_over_all_residual_risk_rating_id: ratingValue
+      .references.code(),
+    mitigation_further_actions: text(),
+    control_monitor_mitigation_actions_tracking_strategy: text(),
+    control_monitor_action_due_date: dateNullable(),
+    control_monitor_risk_owner_id: person.references.person_id(),
+    ...gm.housekeeping.columns,
+  },
+);
+
+/**
+ * Reference URL: https://docs.microfocus.com/UCMDB/11.0/cp-docs/docs/eng/class_model/html/index.html
+ */
+
+const incident = gm.autoIncPkTable(
+  "incident",
+  {
+    incident_id: autoIncPK(),
+    title: text(),
+    incident_date: date(),
+    time_and_time_zone: dateTime(),
+    asset_id: asset.references.asset_id(),
+    category_id: incidentCategory.references.code(),
+    sub_category_id: incidentSubCategory.references.code(),
+    severity_id: severity.references.code(),
+    priority_id: priority.references.code(),
+    internal_or_external_id: incidentType.references.code(),
+    location: text(),
+    it_service_impacted: text(),
+    impacted_modules: text(),
+    impacted_dept: text(),
+    reported_by_id: person.references.person_id(),
+    reported_to_id: person.references.person_id(),
+    brief_description: text(),
+    detailed_description: text(),
+    assigned_to_id: person.references.person_id(),
+    assigned_date: dateNullable(),
+    investigation_details: text(),
+    containment_details: text(),
+    eradication_details: text(),
+    business_impact: text(),
+    lessons_learned: text(),
+    status_id: incidentStatus.references.code(),
+    closed_date: dateNullable(),
+    reopened_time: dateTimeNullable(),
+    feedback_from_business: text(),
+    reported_to_regulatory: text(),
+    report_date: dateNullable(),
+    report_time: dateTimeNullable(),
+    ...gm.housekeeping.columns,
+  },
+);
+
+const incidentRootCause = gm.autoIncPkTable(
+  "incident_root_cause",
+  {
+    incident_root_cause_id: autoIncPK(),
+    incident_id: incident.references.incident_id(),
+    source: text(),
+    description: text(),
+    probability_id: priority.references.code(),
+    testing_analysis: text(),
+    solution: text(),
+    likelihood_of_risk_id: priority.references.code(),
+    modification_of_the_reported_issue: text(),
+    testing_for_modified_issue: text(),
+    test_results: text(),
+    ...gm.housekeeping.columns,
+  },
+);
+
+const raciMatrixAssignment = gm.autoIncPkTable(
+  "raci_matrix_assignment",
+  {
+    raci_matrix_assignment_id: autoIncPK(),
+    person_id: person.references.person_id(),
+    subject_id: raciMatrixSubject.references.code(),
+    activity_id: raciMatrixActivity.references.raci_matrix_activity_id(),
+    raci_matrix_assignment_nature_id: raciMatrixAssignmentNature
+      .references.code(),
+    ...gm.housekeeping.columns,
+  },
+);
+
+const personSkill = gm.autoIncPkTable(
+  "person_skill",
+  {
+    person_skill_id: autoIncPK(),
+    person_id: person.references.person_id(),
+    skill_nature_id: skillNature.references.code(),
+    skill_id: skill.references.code(),
+    proficiency_scale_id: proficiencyScale.references.code(),
+    ...gm.housekeeping.columns,
+  },
+);
+
+const keyPerformance = gm.autoIncPkTable(
+  "key_performance",
+  {
+    key_performance_id: autoIncPK(),
+    title: text(),
+    description: text(),
+    ...gm.housekeeping.columns,
+  },
+);
+
+const keyPerformanceIndicator = gm.autoIncPkTable(
+  "key_performance_indicator",
+  {
+    key_performance_indicator_id: autoIncPK(),
+    key_performance_id: keyPerformance.references.key_performance_id(),
+    asset_id: asset.references.asset_id(),
+    calendar_period_id: calendarPeriod.references.code(),
+    kpi_comparison_operator_id: comparisonOperator.references.code(),
+    kpi_context: text(),
+    kpi_lower_threshold_critical: text(),
+    kpi_lower_threshold_major: text(),
+    kpi_lower_threshold_minor: text(),
+    kpi_lower_threshold_ok: text(),
+    kpi_lower_threshold_warning: text(),
+    kpi_measurement_type_id: kpiMeasurementType.references.code(),
+    kpi_status_id: kpiStatus.references.code(),
+    kpi_threshold_critical: text(),
+    kpi_threshold_major: text(),
+    kpi_threshold_minor: text(),
+    kpi_threshold_ok: text(),
+    kpi_threshold_warning: text(),
+    kpi_unit_of_measure: text(),
+    kpi_value: text(),
+    score: text(),
+    tracking_period_id: trackingPeriod.references.code(),
+    trend_id: trend.references.code(),
+    ...gm.housekeeping.columns,
+  },
+);
+
+const keyRisk = gm.autoIncPkTable(
+  "key_risk",
+  {
+    key_risk_id: autoIncPK(),
+    title: text(),
+    description: text(),
+    base_value: textNullable(),
+    ...gm.housekeeping.columns,
+  },
+);
+
+const keyRiskIndicator = gm.autoIncPkTable(
+  "key_risk_indicator",
+  {
+    key_risk_indicator_id: autoIncPK(),
+    key_risk_id: keyRisk.references.key_risk_id(),
+    entry_date: date(),
+    entry_value: textNullable(),
+    ...gm.housekeeping.columns,
+  },
+);
+
+const assertion = gm.autoIncPkTable(
+  "assertion",
+  {
+    assertion_id: autoIncPK(),
+    foreign_integration: text(),
+    assertion: text(),
+    assertion_explain: text(),
+    assertion_expires_on: dateNullable(),
+    assertion_expires_poam: text(),
+    ...gm.housekeeping.columns,
+  },
+);
+
+const attestation = gm.autoIncPkTable(
+  "attestation",
+  {
+    attestation_id: autoIncPK(),
+    assertion_id: assertion.references.assertion_id(),
+    person_id: person.references.person_id(),
+    attestation: text(),
+    attestation_explain: text(),
+    attested_on: date(),
+    expires_on: dateNullable(),
+    boundary_id: boundary.references.boundary_id(),
+    ...gm.housekeeping.columns,
+  },
+);
+
+const attestationEvidence = gm.autoIncPkTable(
+  "attestation_evidence",
+  {
+    attestation_evidence_id: autoIncPK(),
+    attestation_id: attestation.references.attestation_id(),
+    evidence_nature: text(),
+    evidence_summary_markdown: text(),
+    url: text(),
+    content: text(),
+    attachment: text(),
+    ...gm.housekeeping.columns,
+  },
+);
+
 function sqlDDL() {
   // NOTE: every time the template is "executed" it will fill out tables, views
   //       in gm.tablesDeclared, etc.
@@ -1428,6 +1770,24 @@ function sqlDDL() {
     ${systemInfoMode}
     ${systemInfo}
     ${contract}
+    ${riskSubject}
+    ${riskType}
+    ${riskRegister}
+    ${incidentCategory}
+    ${incidentSubCategory}
+    ${incidentType}
+    ${incidentStatus}
+    ${incident}
+    ${incidentRootCause}
+    ${raciMatrixAssignment}
+    ${personSkill}
+    ${keyPerformance}
+    ${keyPerformanceIndicator}
+    ${keyRisk}
+    ${keyRiskIndicator}
+    ${assertion}
+    ${attestation}
+    ${attestationEvidence}
 
     ${execCtx.seedDML}
     ${organizationRoleType.seedDML}
@@ -1472,6 +1832,12 @@ function sqlDDL() {
     ${severity.seedDML}
     ${assetRiskType.seedDML}
     ${priority.seedDML}
+    ${riskSubject.seedDML}
+    ${riskType.seedDML}
+    ${incidentCategory.seedDML}
+    ${incidentSubCategory.seedDML}
+    ${incidentType.seedDML}
+    ${incidentStatus.seedDML}
     `;
 }
 if (import.meta.main) {
