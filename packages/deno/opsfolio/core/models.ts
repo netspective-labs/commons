@@ -20,6 +20,7 @@ const {
   float,
 } = gm.domains;
 const { autoIncPrimaryKey: autoIncPK } = gm.keys;
+// deno-lint-ignore no-explicit-any
 type Any = any;
 const tcf = SQLa.tableColumnFactory<Any, Any>();
 
@@ -962,7 +963,7 @@ export const raciMatrix = gm.autoIncPkTable("raci_matrix", {
   ...gm.housekeeping.columns,
 });
 
-const raciMatrixSubjectBoundary = gm.autoIncPkTable(
+export const raciMatrixSubjectBoundary = gm.autoIncPkTable(
   "raci_matrix_subject_boundary",
   {
     raci_matrix_subject_boundary_id: autoIncPK(),
@@ -972,7 +973,7 @@ const raciMatrixSubjectBoundary = gm.autoIncPkTable(
   },
 );
 
-const raciMatrixActivity = gm.autoIncPkTable("raci_matrix_activity", {
+export const raciMatrixActivity = gm.autoIncPkTable("raci_matrix_activity", {
   raci_matrix_activity_id: autoIncPK(),
   activity: text(),
   ...gm.housekeeping.columns,
@@ -989,7 +990,7 @@ export const party = gm.autoIncPkTable("party", {
  * Reference URL: https://help.salesforce.com/s/articleView?id=sf.c360_a_partyidentification_object.htm&type=5
  */
 
-const partyIdentifier = gm.autoIncPkTable("party_identifier", {
+export const partyIdentifier = gm.autoIncPkTable("party_identifier", {
   party_identifier_id: autoIncPK(),
   identifier_number: text(),
   party_identifier_type_id: partyIdentifierType.references.code(),
@@ -997,7 +998,7 @@ const partyIdentifier = gm.autoIncPkTable("party_identifier", {
   ...gm.housekeeping.columns,
 });
 
-const person = gm.autoIncPkTable("person", {
+export const person = gm.autoIncPkTable("person", {
   person_id: autoIncPK(),
   party_id: party.references.party_id(),
   person_type_id: personType.references.code(),
@@ -1010,7 +1011,7 @@ const person = gm.autoIncPkTable("person", {
  * Reference URL: https://docs.oracle.com/cd/E29633_01/CDMRF/GUID-F52E49F4-AE6F-4FF5-8EEB-8366A66AF7E9.htm
  */
 
-const partyRelation = gm.autoIncPkTable("party_relation", {
+export const partyRelation = gm.autoIncPkTable("party_relation", {
   party_relation_id: autoIncPK(),
   party_id: party.references.party_id(),
   related_party_id: party.references.party_id(),
@@ -1019,7 +1020,7 @@ const partyRelation = gm.autoIncPkTable("party_relation", {
   ...gm.housekeeping.columns,
 });
 
-const organization = gm.autoIncPkTable("organization", {
+export const organization = gm.autoIncPkTable("organization", {
   organization_id: autoIncPK(),
   party_id: party.references.party_id(),
   name: text(),
@@ -1140,8 +1141,8 @@ const assetRisk = gm.autoIncPkTable("asset_risk", {
   asset_risk_type_id: assetRiskType.references.code(),
   asset_id: asset.references.asset_id(),
   threat_event_id: threatEvent.references.threat_event_id(),
-  relevance_id: severity.references.code(),
-  likelihood_id: probability.references.code(),
+  relevance_id: severity.references.code().optional(),
+  likelihood_id: probability.references.code().optional(),
   impact: text(),
   ...gm.housekeeping.columns,
 });
@@ -1265,10 +1266,10 @@ const rating = gm.autoIncPkTable(
     author_id: person.references.person_id(),
     rating_given_to_id: organization.references.organization_id(),
     rating_value_id: ratingValue.references.code(),
-    best_rating_id: ratingValue.references.code(),
+    best_rating_id: ratingValue.references.code().optional(),
     rating_explanation: text(),
     review_aspect: text(),
-    worst_rating_id: ratingValue.references.code(),
+    worst_rating_id: ratingValue.references.code().optional(),
     ...gm.housekeeping.columns,
   },
 );
@@ -1452,13 +1453,13 @@ const contract = gm.autoIncPkTable(
     contract_id: autoIncPK(),
     contract_from_id: party.references.party_id(),
     contract_to_id: party.references.party_id(),
-    contract_status_id: contractStatus.references.code(),
+    contract_status_id: contractStatus.references.code().optional(),
     document_reference: text(),
-    payment_type_id: paymentType.references.code(),
-    periodicity_id: periodicity.references.code(),
+    payment_type_id: paymentType.references.code().optional(),
+    periodicity_id: periodicity.references.code().optional(),
     start_date: dateTime(),
     end_date: dateTimeNullable(),
-    contract_type_id: contractType.references.code(),
+    contract_type_id: contractType.references.code().optional(),
     date_of_last_review: dateTimeNullable(),
     date_of_next_review: dateTimeNullable(),
     date_of_contract_review: dateTimeNullable(),
@@ -1475,13 +1476,12 @@ const riskRegister = gm.autoIncPkTable(
     risk_subject_id: riskSubject.references.code(),
     risk_type_id: riskType.references.code(),
     impact_to_the_organization: text(),
-    rating_likelihood_id: ratingValue.references.code(),
-    rating_impact_id: ratingValue.references.code(),
-    rating_overall_risk_id: ratingValue.references.code(),
-    control_effectivenes_controls_in_place: text(),
-    control_effectivenes_control_effectiveness: integer(),
-    control_effectivenes_over_all_residual_risk_rating_id: ratingValue
-      .references.code(),
+    rating_likelihood_id: ratingValue.references.code().optional(),
+    rating_impact_id: ratingValue.references.code().optional(),
+    rating_overall_risk_id: ratingValue.references.code().optional(),
+    controls_in_place: text(),
+    control_effectivenes: integer(),
+    over_all_residual_risk_rating_id: ratingValue.references.code().optional(),
     mitigation_further_actions: text(),
     control_monitor_mitigation_actions_tracking_strategy: text(),
     control_monitor_action_due_date: dateNullable(),
@@ -1505,8 +1505,8 @@ const incident = gm.autoIncPkTable(
     category_id: incidentCategory.references.code(),
     sub_category_id: incidentSubCategory.references.code(),
     severity_id: severity.references.code(),
-    priority_id: priority.references.code(),
-    internal_or_external_id: incidentType.references.code(),
+    priority_id: priority.references.code().optional(),
+    internal_or_external_id: incidentType.references.code().optional(),
     location: text(),
     it_service_impacted: text(),
     impacted_modules: text(),
@@ -1522,7 +1522,7 @@ const incident = gm.autoIncPkTable(
     eradication_details: text(),
     business_impact: text(),
     lessons_learned: text(),
-    status_id: incidentStatus.references.code(),
+    status_id: incidentStatus.references.code().optional(),
     closed_date: dateNullable(),
     reopened_time: dateTimeNullable(),
     feedback_from_business: text(),
@@ -1537,13 +1537,13 @@ const incidentRootCause = gm.autoIncPkTable(
   "incident_root_cause",
   {
     incident_root_cause_id: autoIncPK(),
-    incident_id: incident.references.incident_id(),
+    incident_id: incident.references.incident_id().optional(),
     source: text(),
     description: text(),
-    probability_id: priority.references.code(),
+    probability_id: priority.references.code().optional(),
     testing_analysis: text(),
     solution: text(),
-    likelihood_of_risk_id: priority.references.code(),
+    likelihood_of_risk_id: priority.references.code().optional(),
     modification_of_the_reported_issue: text(),
     testing_for_modified_issue: text(),
     test_results: text(),
@@ -1661,7 +1661,7 @@ const attestation = gm.autoIncPkTable(
     attestation_explain: text(),
     attested_on: date(),
     expires_on: dateNullable(),
-    boundary_id: boundary.references.boundary_id(),
+    boundary_id: boundary.references.boundary_id().optional(),
     ...gm.housekeeping.columns,
   },
 );
