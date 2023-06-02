@@ -91,31 +91,63 @@ const partyRelationInsertion = mod.partyRelation
     party_role_id: "VENDOR",
   });
 
+const organizationInsertion = mod.organization
+  .insertDML({
+    party_id: partyID,
+    name: "Test Name",
+    license: "Test License",
+    registration_date: new Date("02/06/2023"),
+  });
+
+const personID = mod.person.select(personInsertion.insertable);
+const organizationID = mod.organization.select(
+  organizationInsertion.insertable,
+);
+
+const organizationRoleInsertion = mod.organizationRole
+  .insertDML({
+    person_id: personID,
+    organization_id: organizationID,
+    organization_role_type_id: "ASSOCIATE_MANAGER_TECHNOLOGY",
+  });
+
+const contactElectronicInsertion = mod.contactElectronic
+  .insertDML({
+    contact_type_id: "MOBILE_PHONE_NUMBER",
+    party_id: partyID,
+    electronics_details: "electronics details",
+  });
+
 function sqlDDL() {
   return SQLa.SQL<EmitContext>(gts.ddlOptions)`
     ${mod.graph}
-    ${graphTableInsertion}
     ${mod.boundary}
+    ${mod.hostBoundary}
+    ${mod.raciMatrixSubjectBoundary}
+    ${mod.party}
+    ${mod.raciMatrixActivity}
+    ${mod.partyIdentifier}
+    ${mod.person}
+    ${mod.partyRelation}
+    ${mod.organization}
+    ${mod.organizationRole}
+    ${mod.contactElectronic}
+
+    ${graphTableInsertion}
     ${boundaryInsertion}
     ${boundarySelfInsertion}
-    ${mod.host}
     ${hostInsertion}
-    ${mod.hostBoundary}
     ${hostBoundaryInsertion}
-    ${mod.raciMatrix}
     ${raciMatrixInsertion}
-    ${mod.raciMatrixSubjectBoundary}
     ${raciMatrixSubjectBoundaryInsertion}
-    ${mod.raciMatrixActivity}
     ${raciMatrixActivityInsertion}
-    ${mod.party}
     ${partyInsertion}
-    ${mod.partyIdentifier}
     ${partyIdentifierInsertion}
-    ${mod.person}
     ${personInsertion}
-    ${mod.partyRelation}
     ${partyRelationInsertion}
+    ${organizationInsertion}
+    ${organizationRoleInsertion}
+    ${contactElectronicInsertion}
     `;
 }
 if (import.meta.main) {
