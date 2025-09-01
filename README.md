@@ -116,3 +116,6 @@ Note: if it's not the first time the package is being published, it may need a v
 ## Further help
 
 Visit the [Nx Documentation](https://nx.dev) to learn more.
+
+
+<!-- Security scan triggered at 2025-09-02 00:50:04 -->
